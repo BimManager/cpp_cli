@@ -13,6 +13,8 @@
 # using <RevitAPIUI.dll>
 
 using namespace System::Collections::Generic;
+
+
 namespace DB = Autodesk::Revit::DB;
 namespace UI = Autodesk::Revit::UI;
 namespace Selection = Autodesk::Revit::UI::Selection;
@@ -36,7 +38,10 @@ namespace Classification
         Classifier(DB::Document ^doc);
         ~Classifier(void); /* IDisposable.Dispose() */ 
         !Classifier(void); /* Finalize() */
-        ICollection<DB::ElementId ^> ^BagsyElements(DB::BuiltInCategory category);
+        ICollection<DB::ElementId ^> ^BagsyElementIds(DB::BuiltInCategory category);
+        void PrintParameter(DB::Element ^elem, System::String ^name);
+        int SetParameter(DB::Parameter ^parameter, System::Object ^value);
+        System::String ^ParameterAsString(DB::Parameter ^parameter);
     private:
         DB::Document ^_doc;
     };
