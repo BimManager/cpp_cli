@@ -136,7 +136,7 @@ namespace Esta
         sw->Close();
     }
 
-    DB::DefinitionGroup ^ParamManager::CreateTempDefFile(AS::Application ^app)
+    DB::DefinitionGroup ^CreateTempDefFile(AS::Application ^app)
     {
         IO::FileStream      ^fs;
         System::String      ^filename;
@@ -162,7 +162,7 @@ namespace Esta
                     System::Text::Encoding::UTF8);
         while ((line = sr->ReadLine()) != nullptr)
         {
-            this->ProcessLine(line, this->CreateTempDefFile(this->_app));
+            this->ProcessLine(line, CreateTempDefFile(this->_app));
         }
         sr->Close();
     }
@@ -191,21 +191,29 @@ namespace Esta
 
     DB::BuiltInParameterGroup StringToParameterGroup(System::String ^str)
     {
-        return ((DB::BuiltInParameterGroup)
+            return ((DB::BuiltInParameterGroup)
             System::Enum::Parse(DB::BuiltInParameterGroup::typeid, str));
     }
 
     void    ParamManager::ProcessLine(System::String ^line, DB::DefinitionGroup ^defGroup)
     {
-        array<System::String ^> ^fields;
-        DB::Definition          ^def;
-        DB::ElementBinding      ^binding;
+        array<System::String ^>                 ^fields;
+        DB::ExternalDefinitionCreationOptions   ^opts;
+        DB::ExternalDefinition                  ^def;
+        DB::ElementBinding                      ^binding;
+        DB::Definitions                         ^defs;
 
+        defs = gcnew DB::Definitions();
         fields = line->Split('\t');
-        def = defGroup->Definitions->Create(gcnew DB::ExternalDefinitionCreationOptions(
-                fields[PARAM_NAME], 
+        opts = gcnew DB::ExternalDefinitionCreationOptions(fields[PARAM_NAME], 
                 (DB::ParameterType)System::Enum::Parse(DB::ParameterType::typeid,
-                fields[PARAM_PARAMETER_TYPE])));             
+                    fields[PARAM_PARAMETER_TYPE]));
+        opts->GUID = System::Guid(fields[PARAM_GUID]);
+        opts->Visible = true;
+        opts->UserModifiable = true;
+        opts->Description = "N/A";
+        def = (DB::ExternalDefinition ^)defGroup->Definitions->Create(opts);
+        //def = (DB::ExternalDefinition ^)defs->Create(opts);
         if (fields[PARAM_KIND] == PARAM_TYPE)
             binding = gcnew DB::TypeBinding(
                 StringsToCategories(fields[PARAM_CATEGORIES], this->_uidoc->Document));

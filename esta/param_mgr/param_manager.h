@@ -21,6 +21,7 @@
 # define PARAM_PARAMETER_TYPE 2
 # define PARAM_CATEGORIES 3
 # define PARAM_KIND 4
+# define PARAM_GUID 5
 
 # using <RevitAPI.dll>
 # using <RevitAPIUI.dll>
@@ -41,6 +42,7 @@ namespace Esta
     System::String ^CategoriesToStrings(DB::CategorySet ^set);
     DB::CategorySet ^StringsToCategories(System::String ^css, DB::Document ^doc);
     System::String ^GetUniqueId(System::String ^name, DB::Document ^doc);
+    DB::DefinitionGroup ^CreateTempDefFile(AS::Application ^app);
 
     [Autodesk::Revit::Attributes::TransactionAttribute(
         Autodesk::Revit::Attributes::TransactionMode::Manual)]
@@ -63,17 +65,16 @@ namespace Esta
         void GetInfoAboutEachDef(DB::DefinitionFile ^defFile);
         //void IterateBindings(void (*pfn)(DB::Definition ^, DB::ElementBinding ^));
         void ReadFile(System::String ^filename);
-        DB::DefinitionGroup ^CreateTempDefFile(AS::Application ^app);
-        
+             
     private:
         UI::UIDocument  ^_uidoc;
         AS::Application ^_app;
 
         void    ProcessLine(System::String ^line, DB::DefinitionGroup ^defGroup);
-        void    BindParameter(DB::Definition ^def,
-                DB::ElementBinding ^binding, DB::BuiltInParameterGroup paramGroup);
+        void    BindParameter(DB::Definition ^def, DB::ElementBinding ^binding,
+                    DB::BuiltInParameterGroup paramGroup);
     }; /* ParamManager */
 }
 
 
-#endif
+#endif  
