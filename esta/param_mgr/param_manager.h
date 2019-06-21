@@ -12,6 +12,9 @@
 #ifndef ESTA_PARAM_MANAGER_H
 # define ESTA_PARAM_MANAGER_H
 
+# define STR_TO_ENUM(str, enum) (enum)System::Enum::Parse(enum::typeid, str)
+# define RETURN_SP_ELEM(doc, def) dynamic_cast<DB::SharedParameterElement ^>(doc->GetElement(def->Id));
+
 # define FILENAME "C:\\Users\\kkozlov\\out.txt"
 
 # define GROUP_NAME "Exported"
@@ -34,15 +37,16 @@ namespace DB = Autodesk::Revit::DB;
 namespace UI = Autodesk::Revit::UI;
 namespace AS = Autodesk::Revit::ApplicationServices;
 
+typedef System::String String;
 typedef System::Text::StringBuilder StrBuilder;
 
 namespace Esta
 {
-    void PrintBinding(DB::Definition ^def, DB::ElementBinding ^binding);
-    System::String ^CategoriesToStrings(DB::CategorySet ^set);
-    DB::CategorySet ^StringsToCategories(System::String ^css, DB::Document ^doc);
-    System::String ^GetUniqueId(System::String ^name, DB::Document ^doc);
-    DB::DefinitionGroup ^CreateTempDefFile(AS::Application ^app);
+    String ^CategoriesToStrings(DB::CategorySet ^set);
+    DB::CategorySet ^StringsToCategories(String ^css, DB::Document ^doc);
+    String ^GetUniqueId(String ^name, DB::Document ^doc);
+
+    DB::DefinitionFile ^CreateTempDefFile(AS::Application ^app);
 
     [Autodesk::Revit::Attributes::TransactionAttribute(
         Autodesk::Revit::Attributes::TransactionMode::Manual)]
@@ -51,7 +55,7 @@ namespace Esta
     public:
         virtual UI::Result Execute(
             UI::ExternalCommandData ^commandData,
-            System::String ^%message, 
+            String ^%message, 
             DB::ElementSet ^elements);
     }; /* Command */
 
@@ -60,21 +64,16 @@ namespace Esta
     public:
         ParamManager(AS::Application ^app, UI::UIDocument ^uidoc);
 
-        void WriteToFile(System::String ^filename);
-        StrBuilder  ^ParamManager::GetBindingGen(DB::ElementBinding ^binding);
-        void GetInfoAboutEachDef(DB::DefinitionFile ^defFile);
-        //void IterateBindings(void (*pfn)(DB::Definition ^, DB::ElementBinding ^));
-        void ReadFile(System::String ^filename);
+        void WriteToFile(String ^filename);
+        void ReadFile(String ^filename);
              
     private:
         UI::UIDocument  ^_uidoc;
         AS::Application ^_app;
 
-        void    ProcessLine(System::String ^line, DB::DefinitionGroup ^defGroup);
-        void    BindParameter(DB::Definition ^def, DB::ElementBinding ^binding,
-                    DB::BuiltInParameterGroup paramGroup);
+        void    ProcessLine(String ^line, DB::DefinitionGroup ^defGroup);
+        
     }; /* ParamManager */
 }
-
 
 #endif  

@@ -6,104 +6,34 @@
 
 namespace Esta
 {
-    UI::Result Command::Execute(
-        UI::ExternalCommandData ^commandData,
-        System::String ^%message, 
-        DB::ElementSet ^elements)
+    UI::Result Command::Execute(UI::ExternalCommandData ^commandData,
+        System::String ^%message, DB::ElementSet ^elements)
+    {
+        UI::UIDocument      ^uidoc;
+        AS::Application     ^app;
+        ParamManager        ^mgr;
+        DB::Transaction     ^tr;
+     
+        app = commandData->Application->Application;
+        uidoc = commandData->Application->ActiveUIDocument;    
+        mgr = gcnew ParamManager(app, uidoc);
+        if (!IO::File::Exists(FILENAME))                
+            mgr->WriteToFile(FILENAME);
+        else                
         {
-            ParamManager    ^mgr;
-            DB::Transaction ^tr;
-            UI::UIDocument    ^uidoc;
-
-            uidoc = commandData->Application->ActiveUIDocument;    
-            mgr = gcnew ParamManager(commandData->Application->Application, uidoc);
-                
-            if (!IO::File::Exists(FILENAME))                
-                mgr->WriteToFile(FILENAME);
-            else                
-            {
-                tr = gcnew DB::Transaction(uidoc->Document);
-                tr->Start("Bind Parameters");
-                mgr->ReadFile(FILENAME);
-                tr->Commit();
-            }
-            UI::TaskDialog::Show("Gen", "The task has been done.");
-            return (UI::Result::Succeeded);
+            tr = gcnew DB::Transaction(uidoc->Document);
+            tr->Start("Bind Parameters");
+            mgr->ReadFile(FILENAME);
+            tr->Commit();
         }
-
+        UI::TaskDialog::Show("Gen", "The task has been completed.");
+        return (UI::Result::Succeeded);
+    }
 
     ParamManager::ParamManager(AS::Application ^app, UI::UIDocument ^uidoc)
     {   
         this->_app = app;
         this->_uidoc = uidoc;
-    }        
-
-    void ParamManager::GetInfoAboutEachDef(DB::DefinitionFile ^defFile)
-    {
-        DB::DefinitionGroups    ^defGrps;
-        CL::IEnumerator         ^itr;
-        DB::DefinitionGroup     ^defGrp;
-        DB::ExternalDefinition  ^extDef;
-
-        defGrps = defFile->Groups;
-        itr = defGrps->GetEnumerator();
-        while (itr->MoveNext())
-        {
-            defGrp = (DB::DefinitionGroup ^)itr->Current;
-            if (defGrp == nullptr)
-                continue ;
-        }
-    }
-    GCL::List<DB::ExternalDefinition ^>   ^getDefs(DB::DefinitionGroup ^defGrp)
-    {
-        GCL::List<DB::ExternalDefinition ^>   ^outDefs;
-        DB::Definitions ^defs;
-        CL::IEnumerator ^defItr;
-
-        outDefs = gcnew GCL::List<DB::ExternalDefinition ^>();
-        return (outDefs);
-    }
-
-    StrBuilder  ^ParamManager::GetBindingGen(DB::ElementBinding ^binding)
-    {
-        StrBuilder  ^outGen;
-        DB::CategorySet ^cats;
-        DB::CategorySetIterator ^it;
-
-        outGen = gcnew StrBuilder();
-        cats = binding->Categories;
-        it = cats->ForwardIterator();
-        while (it->MoveNext())
-        {
-            outGen->AppendLine(((DB::Category ^)it->Current)->Name);
-        }
-        (dynamic_cast<DB::TypeBinding ^>(binding)  != nullptr) 
-            ? outGen->AppendLine("Type") : outGen->AppendLine("Instance");
-        return (outGen);
-    }
-
-    void PrintBinding(DB::Definition ^def, DB::ElementBinding ^binding)
-    {
-        UI::TaskDialog::Show("Gen2",
-            System::String::Format("Name: {0}\t Kind: {1}\t{2}\t{3}",
-            def->Name,
-            dynamic_cast<DB::TypeBinding ^>(binding) != nullptr ? "Type" : "Instance",
-            def->ParameterGroup.ToString(),
-            def->ParameterType.ToString()));
-    }
-
-    System::String ^GetUniqueId(System::String ^name, DB::Document ^doc)
-    {
-        DB::SharedParameterApplicableRule   ^rule;
-        DB::ElementParameterFilter          ^filter;
-        DB::FilteredElementCollector        ^col;
-        DB::Element                         ^elem;
-
-        rule = gcnew DB::SharedParameterApplicableRule(name);
-        filter = gcnew DB::ElementParameterFilter(rule);
-        col = gcnew DB::FilteredElementCollector(doc);
-        elem = col->WherePasses(filter)->FirstElement();
-        return (elem != nullptr ? elem->UniqueId : "NULL");
     }
 
     void ParamManager::WriteToFile(System::String ^filename)
@@ -123,8 +53,7 @@ namespace Esta
             if (((DB::InternalDefinition ^)def)->BuiltInParameter
                         != DB::BuiltInParameter::INVALID)
                 continue ;
-            param = dynamic_cast<DB::SharedParameterElement ^>
-                    (this->_uidoc->Document->GetElement(def->Id));
+            param = RETURN_SP_ELEM(this->_uidoc->Document, def);
             if (param == nullptr)                    
                 continue;
             sw->WriteLine(System::String::Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
@@ -136,33 +65,34 @@ namespace Esta
         sw->Close();
     }
 
-    DB::DefinitionGroup ^CreateTempDefFile(AS::Application ^app)
+    DB::DefinitionFile ^CreateTempDefFile(AS::Application ^app)
     {
         IO::FileStream      ^fs;
         System::String      ^filename;
-        DB::DefinitionFile  ^defFile;
 
         filename = System::IO::Path::GetTempPath() + 
             System::Guid::NewGuid() + ".txt";
         fs = IO::File::Create(filename);
         fs->Close();
         app->SharedParametersFilename = filename;
-        defFile = app->OpenSharedParameterFile();
-        return (defFile->Groups->Create(GROUP_NAME));
+        return (app->OpenSharedParameterFile());
     }
 
     void ParamManager::ReadFile(System::String ^filename)
     {
         IO::StreamReader    ^sr;
         System::String      ^line;
-        DB::Definition      ^def;
-        DB::CategorySet     ^set;
-        
-        sr = gcnew IO::StreamReader(IO::File::Open(filename, IO::FileMode::Open),
-                    System::Text::Encoding::UTF8);
+        DB::DefinitionFile  ^defFile;
+        DB::DefinitionGroup ^defGroup;
+
+        defFile = CreateTempDefFile(this->_app);
+        defGroup = defFile->Groups->Create(GROUP_NAME);
+        sr = gcnew IO::StreamReader(
+            IO::File::Open(filename, IO::FileMode::Open),
+            System::Text::Encoding::UTF8);
         while ((line = sr->ReadLine()) != nullptr)
         {
-            this->ProcessLine(line, CreateTempDefFile(this->_app));
+            this->ProcessLine(line, defGroup);
         }
         sr->Close();
     }
@@ -191,8 +121,9 @@ namespace Esta
 
     DB::BuiltInParameterGroup StringToParameterGroup(System::String ^str)
     {
-            return ((DB::BuiltInParameterGroup)
-            System::Enum::Parse(DB::BuiltInParameterGroup::typeid, str));
+            /* return ((DB::BuiltInParameterGroup)
+            System::Enum::Parse(DB::BuiltInParameterGroup::typeid, str)); */
+            return (STR_TO_ENUM(str, DB::BuiltInParameterGroup));
     }
 
     void    ParamManager::ProcessLine(System::String ^line, DB::DefinitionGroup ^defGroup)
@@ -220,13 +151,9 @@ namespace Esta
         else                
             binding = gcnew DB::InstanceBinding(
                 StringsToCategories(fields[PARAM_CATEGORIES], this->_uidoc->Document));    
-        this->BindParameter(def, binding, StringToParameterGroup(fields[PARAM_GROUP_TYPE]));
-    }
-
-    void    ParamManager::BindParameter(DB::Definition ^def,
-                DB::ElementBinding ^binding, DB::BuiltInParameterGroup paramGroup)
-    {
-        this->_uidoc->Document->ParameterBindings->Insert(def, binding, paramGroup);
+        this->_uidoc->Document->ParameterBindings
+            ->Insert(def, binding, 
+            STR_TO_ENUM(fields[PARAM_GROUP_TYPE],DB::BuiltInParameterGroup));
     }
 
     System::String ^CategoriesToStrings(DB::CategorySet ^set)
@@ -243,24 +170,5 @@ namespace Esta
            gen->Remove(gen->Length - 1, 1);
         return (gen->ToString());
     }
-
-    /* void    ParamManager::IterateBindings(void (*pfn)(DB::Definition ^,DB::ElementBinding ^))
-    {
-        DB::BindingMap                      ^bndMap;
-        DB::DefinitionBindingMapIterator    ^it;
-
-        bndMap = this->_uidoc->Document->ParameterBindings;
-        it = bndMap->ForwardIterator();
-        while (it->MoveNext())
-        {
-            pfn(it->Key, (DB::ElementBinding ^)it->Current);
-        }
-    }*/
-
-    /* CategorySet */
-    /* InstanceBinding or TypeBinding */
-    /* BindingMap */
-    /* bindingMap.Insert(Definition ^, Binding ^) */
-
 }
 
