@@ -97,12 +97,6 @@ namespace Esta
         sr->Close();
     }
 
-    DB::BuiltInCategory StringToCategory(System::String ^cat)
-    {
-        return ((DB::BuiltInCategory)
-            System::Enum::Parse(DB::BuiltInCategory::typeid, cat));
-    }
-
     DB::CategorySet ^StringsToCategories(System::String ^css, DB::Document ^doc)
     {
         array<System::String ^> ^cats;
@@ -114,16 +108,10 @@ namespace Esta
         i = -1;
         while (++i < cats->Length)
         {
-            set->Insert(doc->Settings->Categories->Item[StringToCategory(cats[i])]);
+            set->Insert(doc->Settings->Categories
+                            ->Item[STR_TO_ENUM(cats[i], DB::BuiltInCategory)]);
         }
         return (set);
-    }
-
-    DB::BuiltInParameterGroup StringToParameterGroup(System::String ^str)
-    {
-            /* return ((DB::BuiltInParameterGroup)
-            System::Enum::Parse(DB::BuiltInParameterGroup::typeid, str)); */
-            return (STR_TO_ENUM(str, DB::BuiltInParameterGroup));
     }
 
     void    ParamManager::ProcessLine(System::String ^line, DB::DefinitionGroup ^defGroup)
@@ -132,27 +120,22 @@ namespace Esta
         DB::ExternalDefinitionCreationOptions   ^opts;
         DB::ExternalDefinition                  ^def;
         DB::ElementBinding                      ^binding;
-        DB::Definitions                         ^defs;
-
-        defs = gcnew DB::Definitions();
+        DB::CategorySet                         ^cats;
+                
         fields = line->Split('\t');
         opts = gcnew DB::ExternalDefinitionCreationOptions(fields[PARAM_NAME], 
-                (DB::ParameterType)System::Enum::Parse(DB::ParameterType::typeid,
-                    fields[PARAM_PARAMETER_TYPE]));
+                STR_TO_ENUM(fields[PARAM_PARAMETER_TYPE], DB::ParameterType));
         opts->GUID = System::Guid(fields[PARAM_GUID]);
         opts->Visible = true;
         opts->UserModifiable = true;
         opts->Description = "N/A";
         def = (DB::ExternalDefinition ^)defGroup->Definitions->Create(opts);
-        //def = (DB::ExternalDefinition ^)defs->Create(opts);
+        cats = StringsToCategories(fields[PARAM_CATEGORIES], this->_uidoc->Document);
         if (fields[PARAM_KIND] == PARAM_TYPE)
-            binding = gcnew DB::TypeBinding(
-                StringsToCategories(fields[PARAM_CATEGORIES], this->_uidoc->Document));
+            binding = gcnew DB::TypeBinding(cats);
         else                
-            binding = gcnew DB::InstanceBinding(
-                StringsToCategories(fields[PARAM_CATEGORIES], this->_uidoc->Document));    
-        this->_uidoc->Document->ParameterBindings
-            ->Insert(def, binding, 
+            binding = gcnew DB::InstanceBinding(cats);
+        this->_uidoc->Document->ParameterBindings->Insert(def, binding, 
             STR_TO_ENUM(fields[PARAM_GROUP_TYPE],DB::BuiltInParameterGroup));
     }
 

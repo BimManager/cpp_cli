@@ -42,11 +42,10 @@ typedef System::Text::StringBuilder StrBuilder;
 
 namespace Esta
 {
+    DB::DefinitionFile ^CreateTempDefFile(AS::Application ^app);
     String ^CategoriesToStrings(DB::CategorySet ^set);
     DB::CategorySet ^StringsToCategories(String ^css, DB::Document ^doc);
-    String ^GetUniqueId(String ^name, DB::Document ^doc);
 
-    DB::DefinitionFile ^CreateTempDefFile(AS::Application ^app);
 
     [Autodesk::Revit::Attributes::TransactionAttribute(
         Autodesk::Revit::Attributes::TransactionMode::Manual)]
