@@ -119,5 +119,22 @@ namespace Classification
                 return ("N/A");
         }   
     }
+    void Classifier::CreateObjectFromRoom(AR::Room ^room)
+    {
+        DB::GeometryElement ^geo;
+        DB::DirectShape     ^ds;
+        DB::ElementId       ^catId;
+        IList<DB::GeometryObject ^>   ^gobjs;
+        IEnumerator<DB::GeometryObject ^> ^itr;
 
+        catId = gcnew DB::ElementId(DB::BuiltInCategory::OST_GenericModel);
+        geo = room->ClosedShell;
+        ds = DB::DirectShape::CreateElement(this->_doc, catId);
+        gobjs = gcnew List<DB::GeometryObject ^>();
+        itr = geo->GetEnumerator();
+        while (itr->MoveNext())
+            gobjs->Add(itr->Current);
+        ds->SetShape(gobjs);
+        ds->Name = room->Name;
+    }
 }

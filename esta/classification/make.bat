@@ -17,7 +17,7 @@ set LIB4="c:\Program Files (x86)\Windows Kits\10\Lib\10.0.17763.0\ucrt\x64"
 rem cl %src%.cpp /clr /LD /Zi /AI "x:\kkozlov" 
 
 cl %src%.cpp /clr /Zi /AI x:\kkozlov /link /DLL /LIBPATH:%LIB% ^
-        /LIBPATH:%LIB2% /LIBPATH:%LIB3% /LIBPATH:%LIB4% /OUT:%DLL_NAME%.dll 
+        /LIBPATH:%LIB2% /LIBPATH:%LIB3% /LIBPATH:%LIB4% /OUT:%src%.dll 
 
 copy %src%.dll "x:\kkozlov"
 copy %src%.addin "x:\kkozlov"

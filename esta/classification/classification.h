@@ -17,6 +17,7 @@ using namespace System::Collections::Generic;
 
 namespace DB = Autodesk::Revit::DB;
 namespace UI = Autodesk::Revit::UI;
+namespace AR = Autodesk::Revit::DB::Architecture;
 namespace Selection = Autodesk::Revit::UI::Selection;
 
 namespace Classification
@@ -42,6 +43,9 @@ namespace Classification
         void PrintParameter(DB::Element ^elem, System::String ^name);
         int SetParameter(DB::Parameter ^parameter, System::Object ^value);
         System::String ^ParameterAsString(DB::Parameter ^parameter);
+        void CreateObjectFromRoom(AR::Room 
+        ^room);
+
     private:
         DB::Document ^_doc;
     };
