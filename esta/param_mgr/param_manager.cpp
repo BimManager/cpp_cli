@@ -100,6 +100,7 @@ namespace Esta
     DB::CategorySet ^StringsToCategories(System::String ^css, DB::Document ^doc)
     {
         array<System::String ^> ^cats;
+        DB::Category            ^cat;
         DB::CategorySet         ^set;
         size_t                  i;
 
@@ -108,8 +109,10 @@ namespace Esta
         i = -1;
         while (++i < cats->Length)
         {
-            set->Insert(doc->Settings->Categories
-                            ->Item[STR_TO_ENUM(cats[i], DB::BuiltInCategory)]);
+            cat = doc->Settings->Categories
+                    ->Item[STR_TO_ENUM(cats[i], DB::BuiltInCategory)];
+            if (cat->AllowsBoundParameters)                    
+                set->Insert(cat);
         }
         return (set);
     }
