@@ -3,6 +3,7 @@
  */
 
 #include "param_manager.h"
+#include "form1.h"
 
 namespace Esta
 {
@@ -13,7 +14,10 @@ namespace Esta
         AS::Application     ^app;
         ParamManager        ^mgr;
         DB::Transaction     ^tr;
+        Gui::FilePicker     ^dlg;
      
+        dlg = gcnew Gui::FilePicker();
+        dlg->ShowDialog();
         app = commandData->Application->Application;
         uidoc = commandData->Application->ActiveUIDocument;    
         mgr = gcnew ParamManager(app, uidoc);
@@ -157,4 +161,3 @@ namespace Esta
         return (gen->ToString());
     }
 }
-
