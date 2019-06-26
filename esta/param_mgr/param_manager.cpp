@@ -17,7 +17,9 @@ namespace Esta
         Gui::FilePicker     ^dlg;
      
         dlg = gcnew Gui::FilePicker();
+        //dlg->DialogDismissed +=
         dlg->ShowDialog();
+        return (UI::Result::Succeeded);
         app = commandData->Application->Application;
         uidoc = commandData->Application->ActiveUIDocument;    
         mgr = gcnew ParamManager(app, uidoc);
@@ -160,4 +162,4 @@ namespace Esta
            gen->Remove(gen->Length - 1, 1);
         return (gen->ToString());
     }
-}
+}   
