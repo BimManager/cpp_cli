@@ -7,31 +7,21 @@
 
 namespace Esta
 {
-    void    ParamManager::RespondToEvent(System::Object ^s, System::EventArgs ^e)
-    {
-        EventData::DismissedDialogEventArgs ^args;
-
-        args = (EventData::DismissedDialogEventArgs ^)e;
-        if (args->GetAction() == ACTION_EXPORT)
-            this->WriteToFile(args->GetFilepath());
-        else if (args->GetAction() == ACTION_IMPORT)            
-            this->ReadFile(args->GetFilepath());
-            
-    }
     UI::Result Command::Execute(UI::ExternalCommandData ^commandData,
         System::String ^%message, DB::ElementSet ^elements)
     {
-        UI::UIDocument       ^uidoc;
-        AS::Application     ^app;
         ParamManager        ^mgr;
         DB::Transaction     ^tr;
         Gui::FilePicker     ^dlg;
      
-        app = commandData->Application->Application;
-        uidoc = commandData->Application->ActiveUIDocument;
-        mgr = gcnew ParamManager(app, uidoc);    
+        mgr = gcnew ParamManager(
+            commandData->Application->Application,
+            commandData->Application->ActiveUIDocument);
+
         dlg = gcnew Gui::FilePicker();
-        dlg->DialogDismissed += gcnew System::EventHandler(mgr, &ParamManager::RespondToEvent);
+        dlg->DialogDismissed +=
+            gcnew System::EventHandler(
+                mgr, &ParamManager::RespondToEvent);
         dlg->ShowDialog();
         /* dlg->DialogDismissed += 
         dlg->ShowDialog();
@@ -45,7 +35,7 @@ namespace Esta
             mgr->ReadFile(FILENAME);
             tr->Commit();
         }*/
-        UI::TaskDialog::Show("Gen", "The task has been completed.");
+        UI::TaskDialog::Show("Gen", "The job has been completed.");
         return (UI::Result::Succeeded);
     }
 
@@ -114,6 +104,18 @@ namespace Esta
             this->ProcessLine(line, defGroup);
         }
         sr->Close();
+    }
+
+    void    ParamManager::RespondToEvent(System::Object ^s, System::EventArgs ^e)
+    {
+        EventData::DismissedDialogEventArgs ^args;
+
+        args = (EventData::DismissedDialogEventArgs ^)e;
+        if (args->GetAction() == ACTION_EXPORT)
+            this->WriteToFile(args->GetFilepath());
+        else if (args->GetAction() == ACTION_IMPORT)            
+            this->ReadFile(args->GetFilepath());
+            
     }
 
     DB::CategorySet ^StringsToCategories(System::String ^css, DB::Document ^doc)

@@ -45,7 +45,6 @@ void FilePicker::InitializeComponent()
 void    FilePicker::InitializeButton(Forms::Button ^btn, System::String ^title,
             DWG::Point pos, System::EventHandler ^handler)
         {
-            //btn = gcnew Forms::Button();
             btn->Text = title;
             btn->Location = pos;
             btn->Click += handler;
@@ -59,7 +58,7 @@ void    FilePicker::InitializeButtons(void)
     this->_btnExport = gcnew Forms::Button();
     this->_btnCancel = gcnew Forms::Button();
     InitializeButton(this->_btnPickFile, L"Pick File",
-        DWG::Point(10, 10), gcnew System::EventHandler(this, &FilePicker::OnPickClicked));
+        DWG::Point(10, 10),gcnew System::EventHandler(this, &FilePicker::OnPickClicked));
     InitializeButton(this->_btnImport, L"Import",
         DWG::Point(10, 50), gcnew System::EventHandler(this, &FilePicker::OnImportClicked));
     InitializeButton(this->_btnExport, L"Export",
