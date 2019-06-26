@@ -7,23 +7,36 @@
 
 namespace Esta
 {
+    void    ParamManager::RespondToEvent(System::Object ^s, System::EventArgs ^e)
+    {
+        EventData::DismissedDialogEventArgs ^args;
+
+        args = (EventData::DismissedDialogEventArgs ^)e;
+        if (args->GetAction() == ACTION_EXPORT)
+            this->WriteToFile(args->GetFilepath());
+        else if (args->GetAction() == ACTION_IMPORT)            
+            this->ReadFile(args->GetFilepath());
+            
+    }
     UI::Result Command::Execute(UI::ExternalCommandData ^commandData,
         System::String ^%message, DB::ElementSet ^elements)
     {
-        UI::UIDocument      ^uidoc;
+        UI::UIDocument       ^uidoc;
         AS::Application     ^app;
         ParamManager        ^mgr;
         DB::Transaction     ^tr;
         Gui::FilePicker     ^dlg;
      
-        dlg = gcnew Gui::FilePicker();
-        //dlg->DialogDismissed +=
-        dlg->ShowDialog();
-        return (UI::Result::Succeeded);
         app = commandData->Application->Application;
-        uidoc = commandData->Application->ActiveUIDocument;    
-        mgr = gcnew ParamManager(app, uidoc);
-        if (!IO::File::Exists(FILENAME))                
+        uidoc = commandData->Application->ActiveUIDocument;
+        mgr = gcnew ParamManager(app, uidoc);    
+        dlg = gcnew Gui::FilePicker();
+        dlg->DialogDismissed += gcnew System::EventHandler(mgr, &ParamManager::RespondToEvent);
+        dlg->ShowDialog();
+        /* dlg->DialogDismissed += 
+        dlg->ShowDialog();
+        return (UI::Result::Succeeded);*/
+        /* if (!IO::File::Exists(FILENAME))                
             mgr->WriteToFile(FILENAME);
         else                
         {
@@ -31,7 +44,7 @@ namespace Esta
             tr->Start("Bind Parameters");
             mgr->ReadFile(FILENAME);
             tr->Commit();
-        }
+        }*/
         UI::TaskDialog::Show("Gen", "The task has been completed.");
         return (UI::Result::Succeeded);
     }

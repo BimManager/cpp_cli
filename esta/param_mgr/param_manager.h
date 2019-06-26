@@ -63,8 +63,9 @@ namespace Esta
     public:
         ParamManager(AS::Application ^app, UI::UIDocument ^uidoc);
 
-        void WriteToFile(String ^filename);
-        void ReadFile(String ^filename);
+        void    WriteToFile(String ^filename);
+        void    ReadFile(String ^filename);
+        void    RespondToEvent(System::Object ^s, System::EventArgs ^e);
              
     private:
         UI::UIDocument  ^_uidoc;

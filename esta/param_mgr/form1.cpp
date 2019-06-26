@@ -78,7 +78,7 @@ void    FilePicker::InitializeLabel(Forms::Label ^lbl)
 
 void    FilePicker::OnDialogDismissed(DismissedDialogEventArgs ^e)
 {
-
+    this->DialogDismissed(this, e);
 }
 
 void FilePicker::OnPickClicked(System::Object ^s, System::EventArgs ^e)
@@ -99,19 +99,24 @@ void FilePicker::OnPickClicked(System::Object ^s, System::EventArgs ^e)
 
 void FilePicker::OnImportClicked(System::Object ^s, System::EventArgs ^e)
 {
-    System::EventHandler        ^handler;
-    DismissedDialogEventArgs    ^args;
-
     if (this->_lblFilename->Text->Length)
     {
-        args = gcnew DismissedDialogEventArgs(this->_lblFilename->Text, ACTION_IMPORT);
-        this->DialogDismissed(this, args);
+        this->OnDialogDismissed(
+            gcnew DismissedDialogEventArgs(
+                this->_lblFilename->Text, ACTION_IMPORT));
+        this->Close();
     }
 }
 
 void FilePicker::OnExportClicked(System::Object ^s, System::EventArgs ^e)
 {
-
+    if (this->_lblFilename->Text->Length)
+    {
+        this->OnDialogDismissed(
+            gcnew DismissedDialogEventArgs(
+                this->_lblFilename->Text, ACTION_EXPORT));
+        this->Close();
+    }
 }
 
 void FilePicker::OnCancelClicked(System::Object ^s, System::EventArgs ^e)
