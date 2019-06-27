@@ -45,20 +45,17 @@ namespace Esta
             Forms::Button   ^_btnImport;
             Forms::Button   ^_btnExport;
             Forms::Button   ^_btnCancel;
-            Forms::Label    ^_lblFilename;
+            System::String  ^_filepath;
 
             void    InitializeComponent(void);
             void    InitializeButton(Forms::Button ^btn, System::String ^title,
                         DWG::Point pos, System::EventHandler ^handler);
             void    InitializeButtons(void);
-            void    InitializeLabel(Forms::Label ^lbl);
-
+            void    BringUpSaveDialog(void);
+            void    BringUpOpenDialog(void);
             void    OnImportClicked(System::Object ^s, System::EventArgs ^e);
             void    OnExportClicked(System::Object ^s, System::EventArgs ^e);
             void    OnCancelClicked(System::Object ^s, System::EventArgs ^e);
-
-            void    BringUpSaveDialog(void);
-            void    BringUpOpenDialog(void);
         };
     }
 }

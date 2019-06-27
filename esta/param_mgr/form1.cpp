@@ -38,8 +38,6 @@ void FilePicker::InitializeComponent()
     this->HelpButton = true;
     this->MaximizeBox = false;
     this->InitializeButtons();
-    this->_lblFilename = gcnew Forms::Label();
-    this->InitializeLabel(this->_lblFilename);
 }
 
 void    FilePicker::InitializeButton(Forms::Button ^btn, System::String ^title,
@@ -64,14 +62,6 @@ void    FilePicker::InitializeButtons(void)
         DWG::Point(10, 150), gcnew System::EventHandler(this, &FilePicker::OnCancelClicked));
 }
 
-void    FilePicker::InitializeLabel(Forms::Label ^lbl)
-{
-    lbl->Text = System::String::Empty;
-    lbl->Location = DWG::Point(10, 10);
-    lbl->Size = DWG::Size(150, 35);
-    this->Controls->Add(lbl);
-}
-
 void    FilePicker::OnDialogDismissed(DismissedDialogEventArgs ^e)
 {
     this->DialogDismissed(this, e);
@@ -84,9 +74,10 @@ void    FilePicker::BringUpSaveDialog(void)
     saveDlg = gcnew Forms::SaveFileDialog();
     saveDlg->Filter = "txt files (*.txt)|*txt";
     saveDlg->DefaultExt = "txt";
+    saveDlg->RestoreDirectory = 0;
     if (saveDlg->ShowDialog() == Forms::DialogResult::OK)
     {
-        this->_lblFilename->Text = 
+        this->_filepath = 
             (gcnew System::IO::FileInfo(saveDlg->FileName))->FullName;
     }
 }
@@ -100,7 +91,7 @@ void    FilePicker::BringUpOpenDialog(void)
     openDlg->Filter = "txt files (*.txt)|*.txt";
     if (openDlg->ShowDialog() == Forms::DialogResult::OK)
     {
-        this->_lblFilename->Text =
+        this->_filepath = 
             (gcnew System::IO::FileInfo(openDlg->SafeFileName))->FullName;
     }
 }
@@ -108,24 +99,24 @@ void    FilePicker::BringUpOpenDialog(void)
 void FilePicker::OnImportClicked(System::Object ^s, System::EventArgs ^e)
 {
     this->BringUpOpenDialog();
-    if (this->_lblFilename->Text->Length)
+    if (this->_filepath->Length)
     {
         this->Close();
         this->OnDialogDismissed(
             gcnew DismissedDialogEventArgs(
-                this->_lblFilename->Text, ACTION_IMPORT));
+                this->_filepath, ACTION_IMPORT));
     }
 }
 
 void FilePicker::OnExportClicked(System::Object ^s, System::EventArgs ^e)
 {
     this->BringUpSaveDialog();
-    if (this->_lblFilename->Text->Length)
+    if (this->_filepath->Length)
     {
         this->Close();
         this->OnDialogDismissed(
             gcnew DismissedDialogEventArgs(
-                this->_lblFilename->Text, ACTION_EXPORT));
+                this->_filepath, ACTION_EXPORT));
     }
 }
 
