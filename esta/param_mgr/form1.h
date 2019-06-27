@@ -42,7 +42,6 @@ namespace Esta
         protected:
             virtual void OnDialogDismissed(EventData::DismissedDialogEventArgs ^e);
         private:
-            Forms::Button   ^_btnPickFile;
             Forms::Button   ^_btnImport;
             Forms::Button   ^_btnExport;
             Forms::Button   ^_btnCancel;
@@ -54,10 +53,12 @@ namespace Esta
             void    InitializeButtons(void);
             void    InitializeLabel(Forms::Label ^lbl);
 
-            void    OnPickClicked(System::Object ^s, System::EventArgs ^e);
             void    OnImportClicked(System::Object ^s, System::EventArgs ^e);
             void    OnExportClicked(System::Object ^s, System::EventArgs ^e);
             void    OnCancelClicked(System::Object ^s, System::EventArgs ^e);
+
+            void    BringUpSaveDialog(void);
+            void    BringUpOpenDialog(void);
         };
     }
 }

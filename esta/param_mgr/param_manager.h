@@ -78,15 +78,18 @@ namespace Esta
         ParamManager(AS::Application ^app, UI::UIDocument ^uidoc);
 
         void    WriteToFile(String ^filename);
-        void    ReadFile(String ^filename);
+        //void    ReadFile(String ^filename);
+        void    ImportParameters(String ^filename);
         void    RespondToEvent(System::Object ^s, System::EventArgs ^e);
              
     private:
         UI::UIDocument  ^_uidoc;
         AS::Application ^_app;
 
-        void    ProcessLine(String ^line, DB::DefinitionGroup ^defGroup);
+        //void    ProcessLine(String ^line, DB::DefinitionGroup ^defGroup);
+        void    BindParameters(String ^line, DB::Definitions ^defs);
         static String ^GenerateHeader(void);
+
         
     }; /* ParamManager */
 }

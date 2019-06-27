@@ -100,7 +100,7 @@ namespace Esta
         return (app->OpenSharedParameterFile());
     }
 
-    void ParamManager::ReadFile(System::String ^filename)
+    /* void ParamManager::ReadFile(System::String ^filename)
     {
         IO::StreamReader    ^sr;
         System::String      ^line;
@@ -114,21 +114,30 @@ namespace Esta
             System::Text::Encoding::UTF8);
         while ((line = sr->ReadLine()) != nullptr)
         {
-            this->ProcessLine(line, defGroup);
+            if (line->StartsWith("PARAM"))
+                this->ProcessLine(line, defGroup);
         }
         sr->Close();
-    }
+    }*/
 
-    void    ParamManager::RespondToEvent(System::Object ^s, System::EventArgs ^e)
+    void    ParamManager::ImportParameters(String ^filepath)
     {
-        EventData::DismissedDialogEventArgs ^args;
+        IO::StreamReader    ^sr;
+        String              ^line;
+        DB::Definitions     ^defs;
+        String              ^spfile;
 
-        args = (EventData::DismissedDialogEventArgs ^)e;
-        if (args->GetAction() == ACTION_EXPORT)
-            this->WriteToFile(args->GetFilepath());
-        else if (args->GetAction() == ACTION_IMPORT)            
-            this->ReadFile(args->GetFilepath());
-            
+        spfile = this->_app->SharedParametersFilename;
+        this->_app->SharedParametersFilename = filepath;
+        defs = _app->OpenSharedParameterFile()->Groups
+                    ->Item[PARAM_GROUP_NAME]->Definitions;
+        sr = gcnew IO::StreamReader(filepath, System::Text::Encoding::Unicode);
+        while ((line = sr->ReadLine()) != nullptr)
+        {
+            if (line->StartsWith("PARAM"))
+                this->BindParameters(line, defs);
+        }
+        this->_app->SharedParametersFilename = spfile;
     }
 
     DB::CategorySet ^StringsToCategories(System::String ^css, DB::Document ^doc)
@@ -151,7 +160,24 @@ namespace Esta
         return (set);
     }
 
-    void    ParamManager::ProcessLine(System::String ^line, DB::DefinitionGroup ^defGroup)
+    void    ParamManager::BindParameters(String ^line, DB::Definitions ^defs)
+    {
+        array<String ^>     ^tab;
+        DB::ElementBinding  ^binding;
+        DB::CategorySet     ^cats;
+
+        tab = line->Split('\t');
+        cats = StringsToCategories(tab[PARAM_CATEGORIES], this->_uidoc->Document);
+        if (tab[PARAM_KIND] == "T")
+            binding = gcnew DB::TypeBinding(cats);
+        else            
+            binding = gcnew DB::InstanceBinding(cats);
+        this->_uidoc->Document->ParameterBindings
+            ->Insert(defs->Item[tab[PARAM_NAME]], binding, STR_TO_ENUM(
+                tab[PARAM_PARAMETER_GROUP], DB::BuiltInParameterGroup));
+    }
+
+    /* void    ParamManager::ProcessLine(System::String ^line, DB::DefinitionGroup ^defGroup)
     {
         array<System::String ^>                 ^fields;
         DB::ExternalDefinitionCreationOptions   ^opts;
@@ -160,6 +186,12 @@ namespace Esta
         DB::CategorySet                         ^cats;
                 
         fields = line->Split('\t');
+        if (fields->Length < 12)
+            {
+                UI::TaskDialog::Show("Error", String::Format(
+                    "The number of fields is {0}", fields->Length));
+                return ;
+            }
         opts = gcnew DB::ExternalDefinitionCreationOptions(fields[PARAM_NAME], 
                 STR_TO_ENUM(fields[PARAM_DATATYPE], DB::ParameterType));
         opts->GUID = System::Guid(fields[PARAM_GUID]);
@@ -173,8 +205,8 @@ namespace Esta
         else                
             binding = gcnew DB::InstanceBinding(cats);
         this->_uidoc->Document->ParameterBindings->Insert(def, binding, 
-            STR_TO_ENUM(fields[PARAM_DATACATEGORY],DB::BuiltInParameterGroup));
-    }
+            STR_TO_ENUM(fields[PARAM_PARAMETER_GROUP],DB::BuiltInParameterGroup));
+    }*/
 
     System::String ^CategoriesToStrings(DB::CategorySet ^set)
     {
@@ -189,5 +221,24 @@ namespace Esta
         if (gen->Length > 1)
            gen->Remove(gen->Length - 1, 1);
         return (gen->ToString());
+    }
+
+    void    ParamManager::RespondToEvent(System::Object ^s, System::EventArgs ^e)
+    {
+        EventData::DismissedDialogEventArgs ^args;
+        DB::Transaction                     ^tr;
+
+        args = (EventData::DismissedDialogEventArgs ^)e;
+        if (args->GetAction() == ACTION_EXPORT)
+            this->WriteToFile(args->GetFilepath());
+        else if (args->GetAction() == ACTION_IMPORT)
+        {
+            tr = gcnew DB::Transaction(this->_uidoc->Document);
+            tr->Start("Binding shared parameters");
+            //this->ReadFile(args->GetFilepath());
+            this->ImportParameters(args->GetFilepath());
+            tr->Commit();
+        }
+            
     }
 }   
