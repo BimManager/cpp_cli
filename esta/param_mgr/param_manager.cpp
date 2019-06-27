@@ -45,6 +45,16 @@ namespace Esta
         this->_uidoc = uidoc;
     }
 
+    String ^ParamManager::GenerateHeader(void)
+    {
+        return (String::Format("# This is a Revit shared parameter file.\n"
+            "# Do not edit manually.\n*META\tVERSION\tMINVERSION\n"
+            "META\t2\t1\n*GROUP\tID\tNAME\n"
+            "GROUP\t1\tExported Parameters\n"
+            "*PARAM\tGUID\tNAME\tDATATYPE\tDATACATEGORY\tGROUP\tVISIBLE\t"
+            "DESCRIPTION\tUSERMODIFIABLE\tPARAMETERGROUP\tKIND\tCATEGORIES"));
+    }
+
     void ParamManager::WriteToFile(System::String ^filename)
     {
         IO::StreamWriter                    ^sw;
@@ -54,7 +64,8 @@ namespace Esta
         DB::SharedParameterElement          ^param;
 
         it = this->_uidoc->Document->ParameterBindings->ForwardIterator();
-        sw = gcnew IO::StreamWriter(filename, true, System::Text::Encoding::UTF8);
+        sw = gcnew IO::StreamWriter(filename, true, System::Text::Encoding::Unicode);
+        sw->WriteLine(ParamManager::GenerateHeader());
         while (it->MoveNext())
         {
             def = (DB::InternalDefinition ^)it->Key;
@@ -65,11 +76,13 @@ namespace Esta
             param = RETURN_SP_ELEM(this->_uidoc->Document, def);
             if (param == nullptr)                    
                 continue;
-            sw->WriteLine(System::String::Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
-            def->Name, def->ParameterGroup, def->ParameterType,
-            CategoriesToStrings(binding->Categories),
-            dynamic_cast<DB::TypeBinding ^>(binding) != nullptr ? "Type" : "Instance",
-            param->GuidValue.ToString()));
+            sw->WriteLine(System::String::Format("PARAM\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}" + 
+            "\t{6}\t{7}\t{8}\t{9}\t{10}",
+            param->GuidValue.ToString(), def->Name, def->ParameterType,
+            String::Empty, "1", "1", "N/A", "1", def->ParameterGroup,
+            dynamic_cast<DB::TypeBinding ^>(binding) != nullptr ? "T" : "I",
+            CategoriesToStrings(binding->Categories)));
+            
         }
         sw->Close();
     }
@@ -95,7 +108,7 @@ namespace Esta
         DB::DefinitionGroup ^defGroup;
 
         defFile = CreateTempDefFile(this->_app);
-        defGroup = defFile->Groups->Create(GROUP_NAME);
+        defGroup = defFile->Groups->Create(PARAM_GROUP_NAME);
         sr = gcnew IO::StreamReader(
             IO::File::Open(filename, IO::FileMode::Open),
             System::Text::Encoding::UTF8);
@@ -148,19 +161,19 @@ namespace Esta
                 
         fields = line->Split('\t');
         opts = gcnew DB::ExternalDefinitionCreationOptions(fields[PARAM_NAME], 
-                STR_TO_ENUM(fields[PARAM_PARAMETER_TYPE], DB::ParameterType));
+                STR_TO_ENUM(fields[PARAM_DATATYPE], DB::ParameterType));
         opts->GUID = System::Guid(fields[PARAM_GUID]);
-        opts->Visible = true;
-        opts->UserModifiable = true;
-        opts->Description = "N/A";
+        opts->Visible = fields[PARAM_VISIBLE] == "1" ? 1 : 0;
+        opts->UserModifiable = fields[PARAM_USERMODIFIABLE] == "1" ? 1 : 0;
+        opts->Description = fields[PARAM_DESCRIPTION];
         def = (DB::ExternalDefinition ^)defGroup->Definitions->Create(opts);
         cats = StringsToCategories(fields[PARAM_CATEGORIES], this->_uidoc->Document);
-        if (fields[PARAM_KIND] == PARAM_TYPE)
+        if (fields[PARAM_KIND] == "T")
             binding = gcnew DB::TypeBinding(cats);
         else                
             binding = gcnew DB::InstanceBinding(cats);
         this->_uidoc->Document->ParameterBindings->Insert(def, binding, 
-            STR_TO_ENUM(fields[PARAM_GROUP_TYPE],DB::BuiltInParameterGroup));
+            STR_TO_ENUM(fields[PARAM_DATACATEGORY],DB::BuiltInParameterGroup));
     }
 
     System::String ^CategoriesToStrings(DB::CategorySet ^set)

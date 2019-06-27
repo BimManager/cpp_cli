@@ -17,14 +17,28 @@
 
 # define FILENAME "C:\\Users\\kkozlov\\out.txt"
 
-# define GROUP_NAME "Exported"
+# define PARAM_GUID             1
+# define PARAM_NAME             2
+# define PARAM_DATATYPE         3
+# define PARAM_DATACATEGORY     4
+# define PARAM_GROUP            5
+# define PARAM_VISIBLE          6
+# define PARAM_DESCRIPTION      7
+# define PARAM_USERMODIFIABLE   8
+# define PARAM_PARAMETER_GROUP  9
+# define PARAM_KIND             10
+# define PARAM_CATEGORIES       11
+
+# define PARAM_GROUP_NAME       "Exported Parameters"
+
+/* # define GROUP_NAME "Exported"
 # define PARAM_TYPE "Type"
 # define PARAM_NAME 0
 # define PARAM_GROUP_TYPE 1
 # define PARAM_PARAMETER_TYPE 2
 # define PARAM_CATEGORIES 3
 # define PARAM_KIND 4
-# define PARAM_GUID 5
+# define PARAM_GUID 5 */
 
 # using <RevitAPI.dll>
 # using <RevitAPIUI.dll>
@@ -72,6 +86,7 @@ namespace Esta
         AS::Application ^_app;
 
         void    ProcessLine(String ^line, DB::DefinitionGroup ^defGroup);
+        static String ^GenerateHeader(void);
         
     }; /* ParamManager */
 }
