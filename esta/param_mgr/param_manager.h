@@ -16,8 +16,6 @@
 # define TRY_PARSE_ENUM(str, ignorecase, res) System::Enum::TryParse((str), (ignorecase), (res))
 # define RETURN_SP_ELEM(doc, def) dynamic_cast<DB::SharedParameterElement ^>(doc->GetElement(def->Id));
 
-# define FILENAME "C:\\Users\\kkozlov\\out.txt"
-
 # define PARAM_GUID             1
 # define PARAM_NAME             2
 # define PARAM_DATATYPE         3
@@ -58,10 +56,7 @@ typedef System::Text::StringBuilder StrBuilder;
 
 namespace Esta
 {
-    DB::DefinitionFile ^CreateTempDefFile(AS::Application ^app);
-    String ^CategoriesToStrings(DB::CategorySet ^set);
-    DB::CategorySet ^StringsToCategories(String ^css, DB::Document ^doc);
-
+    /* DB::DefinitionFile  ^CreateTempDefFile(AS::Application ^app); */
 
     [Autodesk::Revit::Attributes::TransactionAttribute(
         Autodesk::Revit::Attributes::TransactionMode::Manual)]
@@ -79,20 +74,20 @@ namespace Esta
     public:
         ParamManager(AS::Application ^app, UI::UIDocument ^uidoc);
 
-        void    WriteToFile(String ^filename);
-        //void    ReadFile(String ^filename);
-        void    ImportParameters(String ^filename);
-        void    RespondToEvent(System::Object ^s, System::EventArgs ^e);
+        void                    ExportParameters(String ^filename);
+        void                    ImportParameters(String ^filename);
+        void                    RespondToEvent(System::Object ^s, System::EventArgs ^e);
              
     private:
-        UI::UIDocument  ^_uidoc;
-        AS::Application ^_app;
+        UI::UIDocument          ^_uidoc;
+        AS::Application         ^_app;
 
-        //void    ProcessLine(String ^line, DB::DefinitionGroup ^defGroup);
-        void    BindParameters(String ^line, DB::Definitions ^defs);
-        static String ^GenerateHeader(void);
-
-        
+        void                    ExportParameter(DB::DefinitionBindingMapIterator ^it,
+                                        IO::StreamWriter ^sw);
+        void                    BindParameters(String ^line, DB::Definitions ^defs);
+        static String           ^GenerateHeader(void);
+        static String           ^CategoriesToStrings(DB::CategorySet ^set);
+        static DB::CategorySet  ^StringsToCategories(String ^css, DB::Document ^doc);
     }; /* ParamManager */
 }
 
