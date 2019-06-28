@@ -40,7 +40,8 @@ namespace Esta
             "META\t2\t1\n*GROUP\tID\tNAME\n"
             "GROUP\t1\tExported Parameters\n"
             "*PARAM\tGUID\tNAME\tDATATYPE\tDATACATEGORY\tGROUP\tVISIBLE\t"
-            "DESCRIPTION\tUSERMODIFIABLE\tPARAMETERGROUP\tKIND\tCATEGORIES"));
+            "DESCRIPTION\tUSERMODIFIABLE\tPARAMETERGROUP\tKIND\tCATEGORIES\t"
+            "VARIESACROSSGROUPS"));
     }
 
     void ParamManager::WriteToFile(System::String ^filename)
@@ -65,11 +66,12 @@ namespace Esta
             if (param == nullptr)                    
                 continue;
             sw->WriteLine(System::String::Format("PARAM\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}" + 
-            "\t{6}\t{7}\t{8}\t{9}\t{10}",
+            "\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}",
             param->GuidValue.ToString(), def->Name, def->ParameterType,
-            String::Empty, "1", "1", "N/A", "1", def->ParameterGroup,
+            String::Empty, "1", def->Visible ? "1" : "0", "N/A", "1", def->ParameterGroup,
             dynamic_cast<DB::TypeBinding ^>(binding) != nullptr ? "T" : "I",
-            CategoriesToStrings(binding->Categories)));
+            CategoriesToStrings(binding->Categories), 
+            def->VariesAcrossGroups ? "1" : "0"));
             
         }
         sw->Close();

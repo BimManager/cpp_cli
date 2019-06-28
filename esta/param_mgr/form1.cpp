@@ -32,7 +32,7 @@ void FilePicker::InitializeComponent()
 {
     Forms::Button   ^btn;
 
-    this->Size = DWG::Size(300, 300);
+    this->Size = DWG::Size(100, 150);
     this->FormBorderStyle = Forms::FormBorderStyle::FixedDialog;
     this->Text = L"Import/Export Shared Parameters";
     this->HelpButton = true;
@@ -56,11 +56,11 @@ void    FilePicker::InitializeButtons(void)
     this->_btnExport = gcnew Forms::Button();
     this->_btnCancel = gcnew Forms::Button();
     InitializeButton(this->_btnImport, L"Import",
-        DWG::Point(10, 50), gcnew System::EventHandler(this, &FilePicker::OnImportClicked));
+        DWG::Point(10, 10), gcnew System::EventHandler(this, &FilePicker::OnImportClicked));
     InitializeButton(this->_btnExport, L"Export",
-        DWG::Point(10, 100), gcnew System::EventHandler(this, &FilePicker::OnExportClicked));
+        DWG::Point(10, 40), gcnew System::EventHandler(this, &FilePicker::OnExportClicked));
     InitializeButton(this->_btnCancel, L"Cancel",
-        DWG::Point(10, 150), gcnew System::EventHandler(this, &FilePicker::OnCancelClicked));
+        DWG::Point(10, 70), gcnew System::EventHandler(this, &FilePicker::OnCancelClicked));
 }
 
 void    FilePicker::OnDialogDismissed(DismissedDialogEventArgs ^e)

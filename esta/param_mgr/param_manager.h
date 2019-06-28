@@ -29,6 +29,7 @@
 # define PARAM_PARAMETER_GROUP  9
 # define PARAM_KIND             10
 # define PARAM_CATEGORIES       11
+# define PARAM_VARIES           12
 
 # define PARAM_GROUP_NAME       "Exported Parameters"
 
