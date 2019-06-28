@@ -13,6 +13,7 @@
 # define ESTA_PARAM_MANAGER_H
 
 # define STR_TO_ENUM(str, enum) (enum)System::Enum::Parse(enum::typeid, str)
+# define TRY_PARSE_ENUM(str, ignorecase, res) System::Enum::TryParse((str), (ignorecase), (res))
 # define RETURN_SP_ELEM(doc, def) dynamic_cast<DB::SharedParameterElement ^>(doc->GetElement(def->Id));
 
 # define FILENAME "C:\\Users\\kkozlov\\out.txt"

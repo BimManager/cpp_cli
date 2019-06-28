@@ -23,18 +23,6 @@ namespace Esta
             gcnew System::EventHandler(
                 mgr, &ParamManager::RespondToEvent);
         dlg->ShowDialog();
-        /* dlg->DialogDismissed += 
-        dlg->ShowDialog();
-        return (UI::Result::Succeeded);*/
-        /* if (!IO::File::Exists(FILENAME))                
-            mgr->WriteToFile(FILENAME);
-        else                
-        {
-            tr = gcnew DB::Transaction(uidoc->Document);
-            tr->Start("Bind Parameters");
-            mgr->ReadFile(FILENAME);
-            tr->Commit();
-        }*/
         UI::TaskDialog::Show("Gen", "The job has been completed.");
         return (UI::Result::Succeeded);
     }
@@ -87,7 +75,7 @@ namespace Esta
         sw->Close();
     }
 
-    DB::DefinitionFile ^CreateTempDefFile(AS::Application ^app)
+    /*DB::DefinitionFile ^CreateTempDefFile(AS::Application ^app)
     {
         IO::FileStream      ^fs;
         System::String      ^filename;
@@ -98,7 +86,7 @@ namespace Esta
         fs->Close();
         app->SharedParametersFilename = filename;
         return (app->OpenSharedParameterFile());
-    }
+    }*/
 
     /* void ParamManager::ReadFile(System::String ^filename)
     {
@@ -135,7 +123,7 @@ namespace Esta
         while ((line = sr->ReadLine()) != nullptr)
         {
             if (line->StartsWith("PARAM"))
-                this->BindParameters(line, defs);
+                       this->BindParameters(line, defs);
         }
         this->_app->SharedParametersFilename = spfile;
     }
@@ -146,14 +134,16 @@ namespace Esta
         DB::Category            ^cat;
         DB::CategorySet         ^set;
         size_t                  i;
+        DB::BuiltInCategory     ecat;
 
-        cats = css->Split(',');
+        cats = css->Split(';');
         set = gcnew DB::CategorySet();
         i = -1;
         while (++i < cats->Length)
         {
-            cat = doc->Settings->Categories
-                    ->Item[STR_TO_ENUM(cats[i], DB::BuiltInCategory)];
+            if (!TRY_PARSE_ENUM(cats[i], true, ecat))
+                continue ;
+            cat = doc->Settings->Categories->Item[ecat];
             if (cat->AllowsBoundParameters)                    
                 set->Insert(cat);
         }
@@ -162,9 +152,10 @@ namespace Esta
 
     void    ParamManager::BindParameters(String ^line, DB::Definitions ^defs)
     {
-        array<String ^>     ^tab;
-        DB::ElementBinding  ^binding;
-        DB::CategorySet     ^cats;
+        array<String ^>             ^tab;
+        DB::ElementBinding          ^binding;
+        DB::CategorySet             ^cats;
+        DB::BuiltInParameterGroup   paramgrp;
 
         tab = line->Split('\t');
         cats = StringsToCategories(tab[PARAM_CATEGORIES], this->_uidoc->Document);
@@ -172,9 +163,9 @@ namespace Esta
             binding = gcnew DB::TypeBinding(cats);
         else            
             binding = gcnew DB::InstanceBinding(cats);
-        this->_uidoc->Document->ParameterBindings
-            ->Insert(defs->Item[tab[PARAM_NAME]], binding, STR_TO_ENUM(
-                tab[PARAM_PARAMETER_GROUP], DB::BuiltInParameterGroup));
+        if (TRY_PARSE_ENUM(tab[PARAM_PARAMETER_GROUP], true, paramgrp) && !cats->IsEmpty)
+            this->_uidoc->Document->ParameterBindings
+                ->Insert(defs->Item[tab[PARAM_NAME]], binding, paramgrp);
     }
 
     /* void    ParamManager::ProcessLine(System::String ^line, DB::DefinitionGroup ^defGroup)
@@ -216,7 +207,7 @@ namespace Esta
         gen = gcnew StrBuilder();
         it = set->ForwardIterator();
         while (it->MoveNext())
-            gen->AppendFormat("{0},", ((DB::BuiltInCategory)
+            gen->AppendFormat("{0};", ((DB::BuiltInCategory)
                 (((DB::Category ^)it->Current)->Id->IntegerValue)).ToString());
         if (gen->Length > 1)
            gen->Remove(gen->Length - 1, 1);

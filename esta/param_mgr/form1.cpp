@@ -38,6 +38,7 @@ void FilePicker::InitializeComponent()
     this->HelpButton = true;
     this->MaximizeBox = false;
     this->InitializeButtons();
+    this->_filepath = System::String::Empty;
 }
 
 void    FilePicker::InitializeButton(Forms::Button ^btn, System::String ^title,
@@ -77,8 +78,7 @@ void    FilePicker::BringUpSaveDialog(void)
     saveDlg->RestoreDirectory = 0;
     if (saveDlg->ShowDialog() == Forms::DialogResult::OK)
     {
-        this->_filepath = 
-            (gcnew System::IO::FileInfo(saveDlg->FileName))->FullName;
+        this->_filepath = saveDlg->FileName;
     }
 }
 
@@ -91,8 +91,7 @@ void    FilePicker::BringUpOpenDialog(void)
     openDlg->Filter = "txt files (*.txt)|*.txt";
     if (openDlg->ShowDialog() == Forms::DialogResult::OK)
     {
-        this->_filepath = 
-            (gcnew System::IO::FileInfo(openDlg->SafeFileName))->FullName;
+        this->_filepath = openDlg->FileName;
     }
 }
 
