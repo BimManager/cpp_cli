@@ -30,6 +30,7 @@ namespace Esta
     {   
         this->_app = app;
         this->_uidoc = uidoc;
+        this->_doc = uidoc->Document;
     }
 
     String ^ParamManager::GenerateHeader(void)
@@ -71,14 +72,24 @@ namespace Esta
     void    ParamManager::ExportParameters(System::String ^filename)
     {
         IO::StreamWriter                    ^sw;
-        DB::DefinitionBindingMapIterator    ^it;
+        //DB::DefinitionBindingMapIterator    ^it;
+        CL::IEnumerator                     ^it;
 
-        it = this->_uidoc->Document->ParameterBindings->ForwardIterator();
         sw = gcnew IO::StreamWriter(filename, true, System::Text::Encoding::Unicode);
         sw->WriteLine(ParamManager::GenerateHeader());
-        while (it->MoveNext())
+        if (!this->_doc->IsFamilyDocument)
         {
-            this->ExportParameter(it, sw);
+            it = this->_uidoc->Document->ParameterBindings->ForwardIterator();
+            while (it->MoveNext())
+                this->ExportParameter((DB::DefinitionBindingMapIterator ^)it, sw);
+        }
+        else
+        {
+            //it = this->_doc->FamilyManager->Parameters->ForwardIterator();
+            it = ParamManager::GetSharedParameterElements(this->_doc)->GetEnumerator();
+            while (it->MoveNext())
+                this->ExportFamilyParameter(
+                    (DB::SharedParameterElement ^)it->Current, sw);
         }
         sw->Close();
     }
@@ -177,6 +188,53 @@ namespace Esta
             tr->Commit();
             UI::TaskDialog::Show("Gen", "The import has been completed.");
         }
+    }
+
+    void    ParamManager::ExportFamilyParameter(
+                DB::FamilyParameter ^param, IO::StreamWriter ^sw)
+    {
+        DB::InternalDefinition  ^def;
+
+        if (!param->IsShared)
+            return ;
+        def = (DB::InternalDefinition ^)param->Definition;
+        sw->WriteLine(String::Format(FORMAT,
+            param->GUID.ToString(),
+            def->Name, def->ParameterType, String::Empty,
+            "1", def->Visible ? "1" : "0", String::Empty,
+            param->UserModifiable ? "1" : "0",
+            def->ParameterGroup,
+            param->IsInstance ? "I" : "T",
+            String::Empty, String::Empty));
+    }
+
+    GCL::ICollection<DB::Element ^> 
+        ^ParamManager::GetSharedParameterElements(DB::Document ^doc)
+    {
+        DB::FilteredElementCollector    ^col;
+        DB::ElementClassFilter          ^classFltr;
+
+        col = gcnew DB::FilteredElementCollector(doc);
+        classFltr = gcnew DB::ElementClassFilter(DB::SharedParameterElement::typeid);
+        return (col->WherePasses(classFltr)->ToElements());
+    }
+
+    void    ParamManager::ExportFamilyParameter(
+        DB::SharedParameterElement ^spElem, IO::StreamWriter ^sw)
+    {
+        DB::InternalDefinition  ^def;
+        DB::FamilyParameter     ^fParam;
+
+        def = spElem->GetDefinition();
+        fParam = this->_doc->FamilyManager->Parameter[def];
+        sw->WriteLine(String::Format(FORMAT,
+            spElem->GuidValue,
+            def->Name, def->ParameterType, String::Empty,
+            "1", def->Visible ? "1" : "0", String::Empty,
+            fParam != nullptr ? (fParam->UserModifiable ? "1" : "0") : "-1",
+            def->ParameterGroup,
+            fParam != nullptr ? (fParam->IsInstance ? "I" : "T") : "-1",
+            String::Empty, String::Empty));
     }
 }   
 

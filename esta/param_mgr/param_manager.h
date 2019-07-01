@@ -13,8 +13,13 @@
 # define ESTA_PARAM_MANAGER_H
 
 # define STR_TO_ENUM(str, enum) (enum)System::Enum::Parse(enum::typeid, str)
-# define TRY_PARSE_ENUM(str, ignorecase, res) System::Enum::TryParse((str), (ignorecase), (res))
-# define RETURN_SP_ELEM(doc, def) dynamic_cast<DB::SharedParameterElement ^>(doc->GetElement(def->Id));
+# define TRY_PARSE_ENUM(str, ignorecase, res) \
+    System::Enum::TryParse((str), (ignorecase), (res))
+# define RETURN_SP_ELEM(doc, def) \
+    dynamic_cast<DB::SharedParameterElement ^>(doc->GetElement(def->Id));
+# define IS_FAMILY_PARAM_INSTANCE(doc, param)  \
+    (doc->FamilyManager->GetAssociatedFamilyParameter(param)->IsInstance)
+
 
 # define PARAM_GUID             1
 # define PARAM_NAME             2
@@ -30,6 +35,7 @@
 # define PARAM_VARIES           12
 
 # define PARAM_GROUP_NAME       "Exported Parameters"
+# define FORMAT "PARAM\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}"
 
 /* # define GROUP_NAME "Exported"
 # define PARAM_TYPE "Type"
@@ -81,13 +87,19 @@ namespace Esta
     private:
         UI::UIDocument          ^_uidoc;
         AS::Application         ^_app;
+        DB::Document            ^_doc;
 
         void                    ExportParameter(DB::DefinitionBindingMapIterator ^it,
-                                        IO::StreamWriter ^sw);
+                                    IO::StreamWriter ^sw);
+        void                    ExportFamilyParameter(DB::FamilyParameter ^param,
+                                    IO::StreamWriter ^sw);
+        void                    ExportFamilyParameter(DB::SharedParameterElement ^spElem,
+                                    IO::StreamWriter ^sw);                                    
         void                    BindParameters(String ^line, DB::Definitions ^defs);
         static String           ^GenerateHeader(void);
         static String           ^CategoriesToStrings(DB::CategorySet ^set);
         static DB::CategorySet  ^StringsToCategories(String ^css, DB::Document ^doc);
+        static GCL::ICollection<DB::Element ^> ^GetSharedParameterElements(DB::Document ^doc);
     }; /* ParamManager */
 }
 
