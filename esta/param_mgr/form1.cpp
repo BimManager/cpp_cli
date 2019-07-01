@@ -30,24 +30,42 @@ FilePicker::FilePicker()
 
 void FilePicker::InitializeComponent()
 {
-    Forms::Button   ^btn;
-
-    this->Size = DWG::Size(100, 150);
+    this->AutoSize = true;
+    this->AutoSizeMode = Forms::AutoSizeMode::GrowAndShrink;
     this->FormBorderStyle = Forms::FormBorderStyle::FixedDialog;
     this->Text = L"Import/Export Shared Parameters";
-    this->HelpButton = true;
     this->MaximizeBox = false;
+    this->MinimizeBox = false;
+    this->InitializeTableLayout(this->_tab);
     this->InitializeButtons();
     this->_filepath = System::String::Empty;
 }
 
+void    FilePicker::InitializeTableLayout(Forms::TableLayoutPanel ^%tab)
+{
+    tab = gcnew Forms::TableLayoutPanel();
+    tab->Location = DWG::Point(0,0);
+    tab->BackColor = DWG::SystemColors::Control;
+    tab->ColumnCount = 1;
+    tab->RowCount = 3;
+    tab->ColumnStyles->Add(
+        gcnew Forms::ColumnStyle(Forms::SizeType::Percent, 100));
+    tab->RowStyles->Add(
+        gcnew Forms::RowStyle(Forms::SizeType::Percent, 100 / 3));
+    tab->RowStyles->Add(
+        gcnew Forms::RowStyle(Forms::SizeType::Percent, 100 / 3));
+    tab->RowStyles->Add(
+        gcnew Forms::RowStyle(Forms::SizeType::Percent, 100 / 3));
+    this->Controls->Add(this->_tab);
+}
+
 void    FilePicker::InitializeButton(Forms::Button ^btn, System::String ^title,
-            DWG::Point pos, System::EventHandler ^handler)
+            int row, int col, System::EventHandler ^handler)
         {
             btn->Text = title;
-            btn->Location = pos;
+            btn->Dock = Forms::DockStyle::Fill;
             btn->Click += handler;
-            this->Controls->Add(btn);
+            this->_tab->Controls->Add(btn, row, col);
         }
 
 void    FilePicker::InitializeButtons(void)
@@ -56,11 +74,11 @@ void    FilePicker::InitializeButtons(void)
     this->_btnExport = gcnew Forms::Button();
     this->_btnCancel = gcnew Forms::Button();
     InitializeButton(this->_btnImport, L"Import",
-        DWG::Point(10, 10), gcnew System::EventHandler(this, &FilePicker::OnImportClicked));
+        0, 0, gcnew System::EventHandler(this, &FilePicker::OnImportClicked));
     InitializeButton(this->_btnExport, L"Export",
-        DWG::Point(10, 40), gcnew System::EventHandler(this, &FilePicker::OnExportClicked));
+        0, 1, gcnew System::EventHandler(this, &FilePicker::OnExportClicked));
     InitializeButton(this->_btnCancel, L"Cancel",
-        DWG::Point(10, 70), gcnew System::EventHandler(this, &FilePicker::OnCancelClicked));
+        0, 2, gcnew System::EventHandler(this, &FilePicker::OnCancelClicked));
 }
 
 void    FilePicker::OnDialogDismissed(DismissedDialogEventArgs ^e)

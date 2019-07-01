@@ -42,14 +42,17 @@ namespace Esta
         protected:
             virtual void OnDialogDismissed(EventData::DismissedDialogEventArgs ^e);
         private:
+            Forms::TableLayoutPanel ^_tab;
             Forms::Button   ^_btnImport;
             Forms::Button   ^_btnExport;
             Forms::Button   ^_btnCancel;
             System::String  ^_filepath;
 
+
             void    InitializeComponent(void);
+            void    InitializeTableLayout(Forms::TableLayoutPanel ^%tab);
             void    InitializeButton(Forms::Button ^btn, System::String ^title,
-                        DWG::Point pos, System::EventHandler ^handler);
+                        int row, int col, System::EventHandler ^handler);
             void    InitializeButtons(void);
             void    BringUpSaveDialog(void);
             void    BringUpOpenDialog(void);
