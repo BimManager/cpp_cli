@@ -16,6 +16,10 @@ namespace Esta
 {
     namespace ViewsMgr
     {
+        namespace GCL = System::Collections::Generic;
+        namespace DB = Autodesk::Revit::DB;
+        namespace CL = System::Collections;
+
         [Autodesk::Revit::Attributes::TransactionAttribute(
             Autodesk::Revit::Attributes::TransactionMode::Manual)]
         public ref class Command : Autodesk::Revit::UI::IExternalCommand
@@ -30,8 +34,18 @@ namespace Esta
         ref class ViewsMgr
         {
         public:
+            ViewsMgr(DB::Document ^doc);
 
+            CL::SortedList  ^GetNamesIds(void);
+            void            Execute(void);
+            void            DeleteElements(CL::IList ^viewNames);
         private:
+            DB::Document    ^_doc;
+            CL::SortedList  ^_namesIds;
+
+            void    CollectAllViews(void);
+            void    ConvertViewsData(
+                        GCL::ICollection<DB::ElementId ^> ^viewIds);
         };
 
     }
