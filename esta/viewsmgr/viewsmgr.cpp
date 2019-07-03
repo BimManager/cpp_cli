@@ -10,6 +10,7 @@ namespace Esta
     namespace ViewsMgr
     {
         using namespace Gui;
+        namespace DGS = System::Diagnostics;
 
         Autodesk::Revit::UI::Result Command::Execute(
             Autodesk::Revit::UI::ExternalCommandData ^cmdData,

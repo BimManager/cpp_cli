@@ -16,6 +16,7 @@ namespace Esta
 {
     namespace ViewsMgr
     {
+        namespace DGS = System::Diagnostics;
         namespace GCL = System::Collections::Generic;
         namespace DB = Autodesk::Revit::DB;
         namespace CL = System::Collections;
