@@ -25,7 +25,7 @@ namespace Esta
         public ref class   ViewsMgrForm : Forms::Form
         {
         public:
-            ViewsMgrForm(void);
+            //ViewsMgrForm(void);
             ViewsMgrForm(CL::IList ^names);
 
             CL::IList   ^GetCheckedIndices(void);
@@ -37,7 +37,7 @@ namespace Esta
             Forms::CheckedListBox   ^_lbviews;
             Forms::Button           ^_btnDelete;
             Forms::Button           ^_btnSelectAll;
-            Forms::Button           ^_btnDiselectAll;
+            Forms::Button           ^_btnDeselectAll;
             Forms::Button           ^_btnNotOnSheets;
             Forms::Button           ^_btnCancel;
             CL::IList               ^_viewNames;
@@ -58,7 +58,7 @@ namespace Esta
             void    OnCancelClicked(System::Object ^s, System::EventArgs ^e);
             void    OnSelectAllClicked(System::Object ^s, System::EventArgs ^e);
             void    OnNotOnSheetsClicked(System::Object ^s, System::EventArgs ^e);
-            void    OnDiselectAllClicked(System::Object ^s, System::EventArgs ^e);
+            void    OnDeselectAllClicked(System::Object ^s, System::EventArgs ^e);
         };
     }
 }

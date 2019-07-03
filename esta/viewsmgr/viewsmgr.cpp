@@ -94,13 +94,17 @@ namespace Esta
         void    ViewsMgr::DeleteElements(CL::IList ^indices)
         {
             CL::IEnumerator ^it;
-            int             idx;
+            DB::ElementId   ^id;
+            DB::ElementId   ^cvId;
 
             it = indices->GetEnumerator();
+            cvId = this->_doc->ActiveView->Id;
             while (it->MoveNext())
             {
-                idx = (int)it->Current;
-                this->_doc->Delete((DB::ElementId ^)this->_namesIds->GetByIndex(idx));
+                id = (DB::ElementId ^)this->_namesIds
+                        ->GetByIndex((int)it->Current);
+                if (cvId->Compare(id))
+                    this->_doc->Delete(id);
             }
         }
     }

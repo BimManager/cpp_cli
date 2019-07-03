@@ -8,14 +8,6 @@ namespace Esta
 {
     namespace Gui
     {
-        ViewsMgrForm::ViewsMgrForm(void)
-        {
-            InitializeComponent();
-            InitializeTableLayoutPanel();
-            //InitializeListBox();
-            InitializeButtons();
-        }
-
         ViewsMgrForm::ViewsMgrForm(CL::IList ^names)
         {
             InitializeComponent();
@@ -26,55 +18,46 @@ namespace Esta
 
         void    ViewsMgrForm::InitializeComponent(void)
         {
-            this->FormBorderStyle = Forms::FormBorderStyle::FixedDialog;
+            this->FormBorderStyle = Forms::FormBorderStyle::Sizable;
             this->MaximizeBox = false;
             this->MinimizeBox = false;
             this->Text = L"Views Manager";
-            this->AutoSize = true;
-            this->Width = 300;
-            this->Height = 300;
-            //this->AutoSizeMode = Forms::AutoSizeMode::GrowAndShrink;
-            //this->AutoSizeMode = Forms::AutoSizeMode::;
+            this->MinimumSize = DWG::Size(300,300);
         }
 
         void    ViewsMgrForm::InitializeTableLayoutPanel(void)
         {
             this->_layout = gcnew Forms::TableLayoutPanel();
-            this->_layout->BackColor = DWG::SystemColors::Control;
             this->_layout->Dock = Forms::DockStyle::Fill;
-            this->_layout->ColumnCount = 5;
-            this->_layout->RowCount = 2;
-            this->_layout->ColumnStyles->Add(
-                gcnew Forms::ColumnStyle(Forms::SizeType::Percent, 20));
-            this->_layout->ColumnStyles->Add(
-                gcnew Forms::ColumnStyle(Forms::SizeType::Percent, 20));
-            this->_layout->ColumnStyles->Add(
-                gcnew Forms::ColumnStyle(Forms::SizeType::Percent, 20));
-            this->_layout->ColumnStyles->Add(
-                gcnew Forms::ColumnStyle(Forms::SizeType::Percent, 20));
-            this->_layout->ColumnStyles->Add(
-                gcnew Forms::ColumnStyle(Forms::SizeType::Percent, 20));                                                
+            this->_layout->ColumnCount = 2;
+            this->_layout->RowCount = 6;
             this->_layout->RowStyles->Add(
-                gcnew Forms::RowStyle(Forms::SizeType::Percent, 90));
+                gcnew Forms::RowStyle(Forms::SizeType::AutoSize));
             this->_layout->RowStyles->Add(
-                gcnew Forms::RowStyle(Forms::SizeType::Percent, 10));
+                gcnew Forms::RowStyle(Forms::SizeType::AutoSize));
+            this->_layout->RowStyles->Add(
+                gcnew Forms::RowStyle(Forms::SizeType::AutoSize));
+            this->_layout->RowStyles->Add(
+                gcnew Forms::RowStyle(Forms::SizeType::AutoSize));
+            this->_layout->RowStyles->Add(
+                gcnew Forms::RowStyle(Forms::SizeType::AutoSize));
+            this->_layout->RowStyles->Add(
+                gcnew Forms::RowStyle(Forms::SizeType::AutoSize));
+            this->_layout->ColumnStyles->Add(
+                gcnew Forms::ColumnStyle(Forms::SizeType::Percent, 100));
+            this->_layout->ColumnStyles->Add(
+                gcnew Forms::ColumnStyle(Forms::SizeType::Absolute, 100));
             this->Controls->Add(this->_layout);
         }
 
         void    ViewsMgrForm::InitializeListBox(CL::IList ^viewNames)
         {
-            Forms::Label    ^lbl1;
-            array<String ^> ^names;
-
-            lbl1 = gcnew Forms::Label();
-            lbl1->Text = "Foo";
             this->_lbviews = gcnew Forms::CheckedListBox();
             this->_viewNames = viewNames;
-            this->FillListBox();
-            this->_layout->Controls->Add(this->_lbviews, 0, 0);
-            this->_lbviews->Sorted = true;
             this->_lbviews->Dock = Forms::DockStyle::Fill;
-            this->_layout->SetColumnSpan(this->_lbviews, 5);
+            this->_layout->Controls->Add(this->_lbviews, 0, 0);
+            this->_layout->SetRowSpan(this->_lbviews, this->_layout->RowCount);
+            this->FillListBox();
         }
 
         void    ViewsMgrForm::FillListBox(void)
@@ -104,19 +87,19 @@ namespace Esta
 
         void    ViewsMgrForm::InitializeButtons(void)
         {
-            this->InitializeButton(this->_btnDelete, 1, 0,
+            this->InitializeButton(this->_btnDelete, 0, 1,
                     "Delete", gcnew EventHandler(this,
                     &ViewsMgrForm::OnDeleteClicked));
             this->InitializeButton(this->_btnSelectAll, 1, 1,
                     "Select All", gcnew EventHandler(this,
                     &ViewsMgrForm::OnSelectAllClicked));
-            this->InitializeButton(this->_btnDiselectAll, 1, 2,
-                    "Diselect All", gcnew EventHandler(this,
-                    &ViewsMgrForm::OnDiselectAllClicked));
-            this->InitializeButton(this->_btnNotOnSheets, 1, 2,
-                    "Not On Sheets", gcnew EventHandler(this,
+            this->InitializeButton(this->_btnDeselectAll, 2, 1,
+                    "Deselect All", gcnew EventHandler(this,
+                    &ViewsMgrForm::OnDeselectAllClicked));
+            this->InitializeButton(this->_btnNotOnSheets, 3, 1,
+                    "Not On Sheet", gcnew EventHandler(this,
                     &ViewsMgrForm::OnNotOnSheetsClicked));                    
-            this->InitializeButton(this->_btnCancel, 1, 4,
+            this->InitializeButton(this->_btnCancel, 4, 1,
                     "Cancel", gcnew EventHandler(this,
                     &ViewsMgrForm::OnCancelClicked));                    
         }
@@ -159,7 +142,7 @@ namespace Esta
                 this->_lbviews->SetItemChecked(i, true);
         }
 
-        void    ViewsMgrForm::OnDiselectAllClicked(System::Object ^s, System::EventArgs ^e)
+        void    ViewsMgrForm::OnDeselectAllClicked(System::Object ^s, System::EventArgs ^e)
         {
            size_t  i;
 
