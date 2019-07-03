@@ -28,7 +28,7 @@ namespace Esta
             ViewsMgrForm(void);
             ViewsMgrForm(CL::IList ^names);
 
-            CL::IList   ^GetCheckedItems(void);
+            CL::IList   ^GetCheckedIndices(void);
         protected:
             /* ~ViewsMgrForm(void) == Dispose(void) */
             /* !ViewsMgrForm(void) == Finalize(void) */
@@ -51,7 +51,8 @@ namespace Esta
                     int row, int col,
                     String ^text, System::EventHandler ^handler);
 
-            void    FillListBox(void);                    
+            void    FillListBox(void);    
+            int     AreAllViewsChecked(void);                
 
             void    OnDeleteClicked(System::Object ^s, System::EventArgs ^e);
             void    OnCancelClicked(System::Object ^s, System::EventArgs ^e);

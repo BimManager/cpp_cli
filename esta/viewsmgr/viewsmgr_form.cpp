@@ -121,21 +121,32 @@ namespace Esta
                     &ViewsMgrForm::OnCancelClicked));                    
         }
 
-        CL::IList   ^ViewsMgrForm::GetCheckedItems(void)
+        CL::IList   ^ViewsMgrForm::GetCheckedIndices(void)
         {
             return (this->_checkedIndices);
         }
 
+        int         ViewsMgrForm::AreAllViewsChecked(void)
+        {
+            size_t  i;
+
+            i = this->_lbviews->Items->Count;
+            while (i--)
+                if(!this->_lbviews->GetItemChecked(i))
+                    return (0);
+            return (1);
+        }
+
         void    ViewsMgrForm::OnDeleteClicked(System::Object ^s, System::EventArgs ^e)
         {
-            CL::IEnumerator ^it;
-
-            this->_checkedIndices = gcnew CL::ArrayList();
-            it = this->_lbviews->CheckedIndices->GetEnumerator();
-            while (it->MoveNext())
+            if (this->AreAllViewsChecked())
             {
-                this->_checkedIndices->Add(it->ToString());
+                Forms::MessageBox::Show(
+                    "Deleting all open views in a project is not allowed.",
+                    "Warning");
+                return ;
             }
+            this->_checkedIndices = this->_lbviews->CheckedIndices;
             this->Close();
         }
 

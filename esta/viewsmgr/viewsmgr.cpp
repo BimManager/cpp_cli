@@ -27,12 +27,10 @@ namespace Esta
                 form = gcnew ViewsMgrForm(mgr->GetNamesIds()->GetKeyList());
                 form->ShowDialog();
                 tr = gcnew DB::Transaction(doc);
-                if (form->GetCheckedItems() != nullptr)
+                if (form->GetCheckedIndices() != nullptr)
                 {
                     tr->Start("Delete views");
-                    Autodesk::Revit::UI::TaskDialog::Show("Gen", 
-                        String::Format("{0} have been selected.",
-                        form->GetCheckedItems()->Count));
+                    mgr->DeleteElements(form->GetCheckedIndices());
                     tr->Commit();
                 }
                 return (Autodesk::Revit::UI::Result::Succeeded);
@@ -89,23 +87,20 @@ namespace Esta
                    v->Name,
                    v->Id->ToString(),
                    p->AsString() != "---" ? "1" : "0"),
-                    v->Name);
+                    v->Id);
             }
         }
 
-        void    ViewsMgr::DeleteElements(CL::IList ^viewNames)
+        void    ViewsMgr::DeleteElements(CL::IList ^indices)
         {
             CL::IEnumerator ^it;
+            int             idx;
 
-            it = viewNames->GetEnumerator();
+            it = indices->GetEnumerator();
             while (it->MoveNext())
             {
-                if (this->_namesIds->Contains((String ^)it->Current))
-                {
-                    this->_doc->Delete(
-                        (DB::ElementId ^)this->_namesIds[(String ^)it->Current]);
-                    Autodesk::Revit::UI::TaskDialog::Show("Gen", "Contains");
-                }
+                idx = (int)it->Current;
+                this->_doc->Delete((DB::ElementId ^)this->_namesIds->GetByIndex(idx));
             }
         }
     }
