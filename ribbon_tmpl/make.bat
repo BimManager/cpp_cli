@@ -1,17 +1,17 @@
 @echo off
 
-set RVT_APIS="%PROGRAMFILES%\Autodesk\Revit 2019"
-set DST_PATH="%APPDATA%\Autodesk\Revit\Addins\2019"
+set RVT_APIS="X:\kkozlov"
+set DST_PATH="X:\kkozlov"
 
-set SRCS=rvt_tmpl.cpp
-set NAME=rvt_tmpl
+set SRCS=ribbon.cpp
+set NAME=ribbon
 
 if "%1" == "" goto:_compile
 if "%1" == "clean" goto:_clean
 if "%1" == "fclean" goto:_fclean
 
 :_compile
-cl %SRCS% /clr /Zi /AI %RVT_APIS% /link /DLL /OUT::%NAME%
+cl %SRCS% /clr /Zi /AI %RVT_APIS% /link /DLL /OUT:%NAME%.dll
 copy %NAME%.dll %DST_PATH%
 copy %NAME%.addin %DST_PATH%
 goto:eof
