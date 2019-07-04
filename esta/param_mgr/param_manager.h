@@ -20,7 +20,6 @@
 # define IS_FAMILY_PARAM_INSTANCE(doc, param)  \
     (doc->FamilyManager->GetAssociatedFamilyParameter(param)->IsInstance)
 
-
 # define PARAM_GUID             1
 # define PARAM_NAME             2
 # define PARAM_DATATYPE         3
@@ -34,7 +33,13 @@
 # define PARAM_CATEGORIES       11
 # define PARAM_VARIES           12
 
+# define PARAM_INVALID          "-1"
+# define PARAM_TYPE             "T"
+# define PARAM_INSTANCE         "I"
+
 # define PARAM_GROUP_NAME       "Exported Parameters"
+# define PARAM_GROUP_NUMBER     "1"
+# define PARAM_DESCRIPTION_TXT  "N/A"
 # define FORMAT "PARAM\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}"
 
 /* # define GROUP_NAME "Exported"
@@ -91,14 +96,15 @@ namespace Esta
 
         void                    ExportParameter(DB::DefinitionBindingMapIterator ^it,
                                     IO::StreamWriter ^sw);
-        void                    ExportFamilyParameter(DB::FamilyParameter ^param,
-                                    IO::StreamWriter ^sw);
+        /* void                    ExportFamilyParameter(DB::FamilyParameter ^param,
+                                    IO::StreamWriter ^sw);*/
         void                    ExportFamilyParameter(DB::SharedParameterElement ^spElem,
                                     IO::StreamWriter ^sw);                                    
-        void                    BindParameters(String ^line, DB::Definitions ^defs);
+        void                    BindParameter(String ^line, DB::Definitions ^defs);
+        void                    BindFamilyParameter(String ^line, DB::Definitions ^def);
         static String           ^GenerateHeader(void);
-        static String           ^CategoriesToStrings(DB::CategorySet ^set);
-        static DB::CategorySet  ^StringsToCategories(String ^css, DB::Document ^doc);
+        static String           ^CategoriesToString(DB::CategorySet ^set);
+        static DB::CategorySet  ^StringToCategories(String ^css, DB::Document ^doc);
         static GCL::ICollection<DB::Element ^> ^GetSharedParameterElements(DB::Document ^doc);
     }; /* ParamManager */
 }

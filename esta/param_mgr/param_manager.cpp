@@ -44,8 +44,10 @@ namespace Esta
             "VARIESACROSSGROUPS"));
     }
 
-    void    ParamManager::ExportParameter(DB::DefinitionBindingMapIterator ^it,
-                         IO::StreamWriter ^sw)
+    /* Exports only a shared parameter */
+    void    ParamManager::ExportParameter(
+                DB::DefinitionBindingMapIterator ^it,
+                IO::StreamWriter ^sw)
     {
         DB::InternalDefinition              ^def;
         DB::ElementBinding                  ^binding;
@@ -59,20 +61,20 @@ namespace Esta
         param = RETURN_SP_ELEM(this->_uidoc->Document, def);
         if (param == nullptr)
             return ;
-        sw->WriteLine(System::String::Format(
-        "PARAM\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}" + 
-        "\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}",
-        param->GuidValue.ToString(), def->Name, def->ParameterType,
-        String::Empty, "1", def->Visible ? "1" : "0", "N/A", "1", def->ParameterGroup,
-        dynamic_cast<DB::TypeBinding ^>(binding) != nullptr ? "T" : "I",
-        CategoriesToStrings(binding->Categories), 
-        def->VariesAcrossGroups ? "1" : "0"));
+        sw->WriteLine(System::String::Format(FORMAT,
+            param->GuidValue.ToString(), def->Name, def->ParameterType,
+            String::Empty, PARAM_GROUP_NUMBER, 
+            def->Visible ? "1" : "0", PARAM_DESCRIPTION_TXT, "1", 
+            def->ParameterGroup,
+            dynamic_cast<DB::TypeBinding ^>(binding) != nullptr ? 
+            PARAM_TYPE : PARAM_INSTANCE,
+            CategoriesToString(binding->Categories), 
+            def->VariesAcrossGroups ? "1" : "0"));
     }
 
     void    ParamManager::ExportParameters(System::String ^filename)
     {
         IO::StreamWriter                    ^sw;
-        //DB::DefinitionBindingMapIterator    ^it;
         CL::IEnumerator                     ^it;
 
         sw = gcnew IO::StreamWriter(filename, true, System::Text::Encoding::Unicode);
@@ -85,7 +87,6 @@ namespace Esta
         }
         else
         {
-            //it = this->_doc->FamilyManager->Parameters->ForwardIterator();
             it = ParamManager::GetSharedParameterElements(this->_doc)->GetEnumerator();
             while (it->MoveNext())
                 this->ExportFamilyParameter(
@@ -100,21 +101,28 @@ namespace Esta
         String              ^line;
         DB::Definitions     ^defs;
         String              ^spfile;
+        char                isfamdoc;
 
         spfile = this->_app->SharedParametersFilename;
         this->_app->SharedParametersFilename = filepath;
         defs = _app->OpenSharedParameterFile()->Groups
-                    ->Item[PARAM_GROUP_NAME]->Definitions;
+                   ->Item[PARAM_GROUP_NAME]->Definitions;
         sr = gcnew IO::StreamReader(filepath, System::Text::Encoding::Unicode);
+        isfamdoc = this->_doc->IsFamilyDocument ? 1 : 0;
         while ((line = sr->ReadLine()) != nullptr)
         {
             if (line->StartsWith("PARAM"))
-                       this->BindParameters(line, defs);
+            {
+                if (isfamdoc)
+                    this->BindFamilyParameter(line, defs);
+                else                    
+                    this->BindParameter(line, defs);
+            }
         }
         this->_app->SharedParametersFilename = spfile;
     }
 
-    DB::CategorySet ^ParamManager::StringsToCategories(System::String ^css, DB::Document ^doc)
+    DB::CategorySet ^ParamManager::StringToCategories(System::String ^css, DB::Document ^doc)
     {
         array<System::String ^> ^cats;
         DB::Category            ^cat;
@@ -136,7 +144,7 @@ namespace Esta
         return (set);
     }
 
-    void    ParamManager::BindParameters(String ^line, DB::Definitions ^defs)
+    void    ParamManager::BindParameter(String ^line, DB::Definitions ^defs)
     {
         array<String ^>             ^tab;
         DB::ElementBinding          ^binding;
@@ -144,7 +152,7 @@ namespace Esta
         DB::BuiltInParameterGroup   paramgrp;
 
         tab = line->Split('\t');
-        cats = StringsToCategories(tab[PARAM_CATEGORIES], this->_uidoc->Document);
+        cats = StringToCategories(tab[PARAM_CATEGORIES], this->_uidoc->Document);
         if (tab[PARAM_KIND] == "T")
             binding = gcnew DB::TypeBinding(cats);
         else            
@@ -154,7 +162,7 @@ namespace Esta
                 ->Insert(defs->Item[tab[PARAM_NAME]], binding, paramgrp);
     }
 
-    System::String  ^ParamManager::CategoriesToStrings(DB::CategorySet ^set)
+    System::String  ^ParamManager::CategoriesToString(DB::CategorySet ^set)
     {
         StrBuilder              ^gen;
         DB::CategorySetIterator ^it;
@@ -178,19 +186,19 @@ namespace Esta
         if (args->GetAction() == ACTION_EXPORT)
         {
             this->ExportParameters(args->GetFilepath());
-            UI::TaskDialog::Show("Gen", "The export has been completed.");
+            UI::TaskDialog::Show("Status", "The export has been completed.");
         }
         else if (args->GetAction() == ACTION_IMPORT)
         {
             tr = gcnew DB::Transaction(this->_uidoc->Document);
             tr->Start("Binding shared parameters");
             this->ImportParameters(args->GetFilepath());
-            tr->Commit();
-            UI::TaskDialog::Show("Gen", "The import has been completed.");
+            if (tr->Commit() == DB::TransactionStatus::Committed)
+                UI::TaskDialog::Show("Status", "The import has been completed.");
         }
     }
 
-    void    ParamManager::ExportFamilyParameter(
+    /*/void    ParamManager::ExportFamilyParameter(
                 DB::FamilyParameter ^param, IO::StreamWriter ^sw)
     {
         DB::InternalDefinition  ^def;
@@ -206,7 +214,7 @@ namespace Esta
             def->ParameterGroup,
             param->IsInstance ? "I" : "T",
             String::Empty, String::Empty));
-    }
+    }*/
 
     GCL::ICollection<DB::Element ^> 
         ^ParamManager::GetSharedParameterElements(DB::Document ^doc)
@@ -230,11 +238,28 @@ namespace Esta
         sw->WriteLine(String::Format(FORMAT,
             spElem->GuidValue,
             def->Name, def->ParameterType, String::Empty,
-            "1", def->Visible ? "1" : "0", String::Empty,
-            fParam != nullptr ? (fParam->UserModifiable ? "1" : "0") : "-1",
+            PARAM_GROUP_NUMBER, def->Visible ? "1" : "0", String::Empty,
+            fParam != nullptr ? (fParam->UserModifiable ? "1" : "0") : PARAM_INVALID,
             def->ParameterGroup,
-            fParam != nullptr ? (fParam->IsInstance ? "I" : "T") : "-1",
+            fParam != nullptr ? (fParam->IsInstance ?
+                PARAM_INSTANCE : PARAM_TYPE) : PARAM_INVALID,
             String::Empty, String::Empty));
+    }
+
+    void    ParamManager::BindFamilyParameter(String ^line, DB::Definitions ^defs)
+    {
+        array<String ^>             ^tab;
+        DB::FamilyManager           ^fm;
+        DB::BuiltInParameterGroup   pg;
+
+       fm = this->_doc->FamilyManager;
+       tab = line->Split('\t');
+       if (System::Enum::TryParse(tab[PARAM_PARAMETER_GROUP], pg) 
+            && tab[PARAM_KIND] != "-1")
+            fm->AddParameter(
+               (DB::ExternalDefinition ^)defs->Item[tab[PARAM_NAME]],
+               pg,
+               tab[PARAM_KIND] == "I" ? 1 : 0);
     }
 }   
 
