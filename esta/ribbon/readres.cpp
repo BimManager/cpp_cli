@@ -20,8 +20,6 @@ int main(array<String ^> ^args)
     Assembly        ^asmb;
     Image           ^img;
 
-    //asmb = Assembly::GetExecutingAssembly();
-    //System::Console::WriteLine(asmb->FullName);
     asmb = Assembly::Load(args[1]);
     rm = gcnew ResourceManager(args[0], asmb);
     img = (Image ^)rm->GetObject(args[2]);
