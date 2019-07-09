@@ -8,29 +8,7 @@ namespace Esta
 {
     UI::Result  Ribbon::OnStartup(UI::UIControlledApplication ^app)
     {
-        UI::RibbonPanel ^ribbon;
-        UI::PushButton  ^btn;
-        IO::MemoryStream    ^ms;
-        Bitmap          ^bmicon;
-        BitmapImage     ^icon;
-
-        app->CreateRibbonTab(TAB_NAME);
-        ribbon = app->CreateRibbonPanel(TAB_NAME, RIBBON_NAME);
-        btn = (UI::PushButton ^)ribbon->
-            AddItem(gcnew UI::PushButtonData(
-                VM_BTN_NAME, VM_BTN_NAME, VM_DLL_PATH, VM_ENTRY_POINT));
-        ms = GetMemoryStream(Assembly::GetExecutingAssembly()
-                ->GetName()->Name, RES_NAME, IMG_NAME);
-        if (ms != nullptr)
-        {
-            LOG("bmicon is not nullptr");
-            icon = StreamToImage(ms);
-            if (icon != nullptr)
-            {
-                LOG(String::Format("H:{0} W:{1}", icon->PixelHeight, icon->PixelWidth));
-                btn->LargeImage = icon;
-            }
-        }
+        InitializeRibbon(app);
         return (UI::Result::Succeeded);
     }
 
@@ -39,15 +17,15 @@ namespace Esta
         return (UI::Result::Succeeded);
     }
 
-    BitmapImage ^Ribbon::GetBitmapImage(
-        String ^asmName, String ^resName, String ^imgName)
+    void    Ribbon::InitializeRibbon(UI::UIControlledApplication ^app)
     {
-        ResourceManager ^rm;
-        Assembly        ^asmb;
+        UI::RibbonPanel ^ribbon;
 
-        asmb = Assembly::Load(asmName);
-        rm = gcnew ResourceManager(resName, asmb);
-        return (dynamic_cast<BitmapImage ^>(rm->GetObject(imgName)));
+        app->CreateRibbonTab(TAB_NAME);
+        ribbon = app->CreateRibbonPanel(TAB_NAME, RIBBON_NAME);
+
+        AddButton(ribbon, VM_ICON, VM_BTN_NAME, VM_ENTRY_POINT, VM_DLL_PATH);
+        AddButton(ribbon, PM_ICON, PM_BTN_NAME, PM_ENTRY_POINT, PM_DLL_PATH);
     }
 
     IO::MemoryStream ^Ribbon::GetMemoryStream(
@@ -61,35 +39,6 @@ namespace Esta
         return (dynamic_cast<IO::MemoryStream ^>(rm->GetObject(imgName)));
     }
 
-    Bitmap       ^Ribbon::GetBitmap(
-        String ^asmName, String ^resName, String ^imgName)
-    {
-        ResourceManager ^rm;
-        Assembly        ^asmb;
-        Bitmap          ^img;
-
-        asmb = Assembly::Load(asmName);
-        rm = gcnew ResourceManager(resName, asmb);
-        img = (Bitmap ^)rm->GetObject(imgName);
-        return (img);
-    }
-
-    BitmapImage       ^Ribbon::BitmapToBitmapImage(Bitmap ^bitmap)
-    {
-        IO::MemoryStream    ^ms;
-        BitmapImage         ^img;
-
-        ms = gcnew IO::MemoryStream();
-        bitmap->Save(ms, System::Drawing::Imaging::ImageFormat::Png);
-        img = gcnew BitmapImage();
-        ms->Seek(0, IO::SeekOrigin::Begin);
-        img->BeginInit();
-        img->StreamSource = ms;
-        img->EndInit();
-        ms->Close();
-        return (img);
-    }
-
     BitmapImage       ^Ribbon::StreamToImage(IO::MemoryStream ^ms)
     {
         BitmapImage         ^icon;
@@ -101,5 +50,37 @@ namespace Esta
         icon->EndInit();
         ms->Close();
         return (icon);
+    }
+
+    void    Ribbon::AddButton(UI::RibbonPanel ^ribbon, String ^iconName,
+                String ^btnName, String ^entpnt)
+    {
+        UI::PushButton      ^btn;
+        IO::MemoryStream    ^ms;
+        BitmapImage         ^icon;
+
+        btn = (UI::PushButton ^)ribbon->
+            AddItem(gcnew UI::PushButtonData(
+                btnName, btnName, VM_DLL_PATH, entpnt));
+        if ((ms = GetMemoryStream(Assembly::GetExecutingAssembly()
+                ->GetName()->Name, RES_NAME, iconName)) != nullptr)
+            if ((icon = StreamToImage(ms)) != nullptr)
+                btn->LargeImage = icon;
+    }
+
+    void    Ribbon::AddButton(UI::RibbonPanel ^ribbon, String ^iconName,
+                String ^btnName, String ^entpnt, String ^dllPath)
+    {
+        UI::PushButton      ^btn;
+        IO::MemoryStream    ^ms;
+        BitmapImage         ^icon;
+
+        btn = (UI::PushButton ^)ribbon->
+            AddItem(gcnew UI::PushButtonData(
+                btnName, btnName, dllPath, entpnt));
+        if ((ms = GetMemoryStream(Assembly::GetExecutingAssembly()
+                ->GetName()->Name, RES_NAME, iconName)) != nullptr)
+            if ((icon = StreamToImage(ms)) != nullptr)
+                btn->LargeImage = icon;
     }
 }

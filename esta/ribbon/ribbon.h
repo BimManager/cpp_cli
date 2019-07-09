@@ -22,14 +22,19 @@
 
 # define TAB_NAME       "ESTA"
 # define RIBBON_NAME    "Esta Addins"
+# define RES_NAME       "icons"
 
-# define VM_DLL_PATH    "C:\\Users\\kkozlov\\AppData\\Roaming\\Autodesk\\Revit\\Addins\\2019\\viewsmgr.dll"
+# define VM_DLL_PATH    "C:\\Users\\kkozlov\\AppData\\Roaming\\" \
+                            "Autodesk\\Revit\\Addins\\2019\\viewsmgr.dll"
 # define VM_BTN_NAME    "Views Manager"
 # define VM_ENTRY_POINT "Esta.ViewsMgr.Command"
+# define VM_ICON    "vm32x32"
 
-# define ASM_NAME   "ribbon.resources"
-# define RES_NAME   "icons"
-# define IMG_NAME   "vm32x32"
+# define PM_DLL_PATH    "C:\\Users\\kkozlov\\AppData\\Roaming\\" \
+                            "Autodesk\\Revit\\Addins\\2019\\paramsmgr.dll"
+# define PM_BTN_NAME    "Params Manager"
+# define PM_ENTRY_POINT "Esta.Command"
+# define PM_ICON    "pm32x32"
 
 namespace Esta
 {
@@ -39,7 +44,7 @@ namespace Esta
     typedef System::Drawing::Bitmap                         Bitmap;
     typedef System::String                                  String;
     typedef System::Windows::Media::Imaging::BitmapImage    BitmapImage;
-    typedef System::Windows::Media::Imaging::BitmapSource    BitmapSource;
+    typedef System::Windows::Media::Imaging::BitmapSource   BitmapSource;
 
     namespace IO = System::IO;
     namespace UI = Autodesk::Revit::UI;
@@ -50,16 +55,16 @@ namespace Esta
     public:
         virtual UI::Result  OnStartup(UI::UIControlledApplication ^app);
         virtual UI::Result  OnShutdown(UI::UIControlledApplication ^app);
+        static void         InitializeRibbon(UI::UIControlledApplication ^app);
+        static void         AddButton(UI::RibbonPanel ^ribbon, String ^iconName,
+                                String ^btnName, String ^entpnt);
+        static void         AddButton(UI::RibbonPanel ^ribbon, String ^iconName,
+                                String ^btnName, String ^entpnt, String ^dllPath);
+        
     private:
         static IO::MemoryStream ^GetMemoryStream(
             String ^asmName, String ^resName, String ^imgName);
         static BitmapImage  ^StreamToImage(IO::MemoryStream ^ms);            
-
-        static Bitmap       ^GetBitmap(
-            String ^asmName, String ^resName, String ^imgName);
-        static BitmapImage  ^GetBitmapImage(
-            String ^asmName, String ^resName, String ^imgName);
-        static BitmapImage  ^BitmapToBitmapImage(Bitmap ^bitmap);
     };
 }
 
