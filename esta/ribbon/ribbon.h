@@ -24,14 +24,15 @@
 # define RIBBON_NAME    "Esta Addins"
 # define RES_NAME       "icons"
 
-# define VM_DLL_PATH    "C:\\Users\\kkozlov\\AppData\\Roaming\\" \
-                            "Autodesk\\Revit\\Addins\\2019\\viewsmgr.dll"
+# define VM_DLL_PATH    System::String::Format("{0}\\Autodesk\\Revit\\Addins\\2019\\viewsmgr.dll", \
+                            System::Environment::GetFolderPath(System::Environment::SpecialFolder::ApplicationData))
 # define VM_BTN_NAME    "Views Manager"
 # define VM_ENTRY_POINT "Esta.ViewsMgr.Command"
 # define VM_ICON    "vm32x32"
 
-# define PM_DLL_PATH    "C:\\Users\\kkozlov\\AppData\\Roaming\\" \
-                            "Autodesk\\Revit\\Addins\\2019\\paramsmgr.dll"
+
+# define PM_DLL_PATH    System::String::Format("{0}\\Autodesk\\Revit\\Addins\\2019\\paramsmgr.dll", \
+                            System::Environment::GetFolderPath(System::Environment::SpecialFolder::ApplicationData))
 # define PM_BTN_NAME    "Params Manager"
 # define PM_ENTRY_POINT "Esta.Command"
 # define PM_ICON    "pm32x32"

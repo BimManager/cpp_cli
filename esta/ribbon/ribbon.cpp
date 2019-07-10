@@ -8,6 +8,8 @@ namespace Esta
 {
     UI::Result  Ribbon::OnStartup(UI::UIControlledApplication ^app)
     {
+        LOG(PM_DLL_PATH);
+        LOG(VM_DLL_PATH);
         InitializeRibbon(app);
         return (UI::Result::Succeeded);
     }
