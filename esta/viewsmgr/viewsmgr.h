@@ -21,6 +21,8 @@ namespace Esta
         namespace DB = Autodesk::Revit::DB;
         namespace CL = System::Collections;
 
+        typedef System::String  String;
+
         [Autodesk::Revit::Attributes::TransactionAttribute(
             Autodesk::Revit::Attributes::TransactionMode::Manual)]
         public ref class Command : Autodesk::Revit::UI::IExternalCommand
@@ -30,6 +32,24 @@ namespace Esta
                 Autodesk::Revit::UI::ExternalCommandData ^cmdData,
                 System::String ^%msg,
                 Autodesk::Revit::DB::ElementSet ^elements);
+        };
+
+        ref class ViewData
+        {
+        public:
+            ViewData(String ^name, String ^uniqueId,
+                DB::ViewType viewType, char isOnSheet);
+
+            String          ^GetName(void);
+            String          ^GetUniqueId(void);
+            DB::ViewType    GetViewType(void);
+            char            IsOnSheet(void);
+
+        private:
+            String          ^_name;
+            String          ^_uniqueId;
+            DB::ViewType    _viewType;
+            char            _isOnSheet;
         };
 
         ref class ViewsMgr
