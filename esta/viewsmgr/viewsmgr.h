@@ -8,9 +8,16 @@
 # define RVT_TMPL_H
 
 # using <mscorlib.dll>
+# using <System.dll>
 
 # using <RevitAPI.dll>
 # using <RevitAPIUI.dll>
+
+# define IS_ON_SHEET(v) \
+            v->Parameter[DB::BuiltInParameter::VIEWER_SHEET_NUMBER] \
+             ->AsString() != "---" ? 1 : 0
+
+# define LOG(s) System::Diagnostics::EventLog::WriteEntry("Application", s)
 
 namespace Esta
 {
@@ -34,7 +41,7 @@ namespace Esta
                 Autodesk::Revit::DB::ElementSet ^elements);
         };
 
-        ref class ViewData
+        ref class ViewData : System::IComparable
         {
         public:
             ViewData(String ^name, String ^uniqueId,
@@ -44,6 +51,8 @@ namespace Esta
             String          ^GetUniqueId(void);
             DB::ViewType    GetViewType(void);
             char            IsOnSheet(void);
+
+            virtual int     CompareTo(System::Object ^obj);
 
         private:
             String          ^_name;
@@ -58,15 +67,19 @@ namespace Esta
             ViewsMgr(DB::Document ^doc);
 
             CL::SortedList  ^GetNamesIds(void);
+            CL::ArrayList    ^GetViewData(void);
             void            Execute(void);
             void            DeleteElements(CL::IList ^viewNames);
         private:
             DB::Document    ^_doc;
             CL::SortedList  ^_namesIds;
+            CL::ArrayList  ^_viewData;
 
             void    CollectAllViews(void);
             void    ConvertViewsData(
                         GCL::ICollection<DB::ElementId ^> ^viewIds);
+            void    ViewsToViewData(GCL::ICollection<DB::ElementId ^> ^viewIds);
+            void    LogViewData(void);
         };
 
     }

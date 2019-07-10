@@ -65,6 +65,8 @@ namespace Esta
                          ->WhereElementIsNotElementType()
                          ->ToElementIds();
             this->ConvertViewsData(viewIds);
+            this->ViewsToViewData(viewIds);
+            this->LogViewData();
         }
 
         /* name;id;notOnSheet;ViewType[Legend] */
@@ -110,6 +112,31 @@ namespace Esta
             }
         }
 
+        void    ViewsMgr::ViewsToViewData(GCL::ICollection<DB::ElementId ^> ^viewIds)
+        {
+            CL::IEnumerator     ^it;
+            DB::View            ^view;
+            ViewData            ^vd;            
+
+            this->_viewData = gcnew CL::ArrayList(viewIds->Count);
+            it = viewIds->GetEnumerator();
+            while (it->MoveNext())
+            {
+                view = dynamic_cast<DB::View ^>(this->
+                        _doc->GetElement((DB::ElementId ^)it->Current));
+                if (view->IsTemplate)
+                    continue ;
+                vd = gcnew ViewData(view->Name, view->UniqueId,
+                        view->ViewType, IS_ON_SHEET(view));
+                this->_viewData->Add(vd);
+            }
+        }
+
+        CL::ArrayList    ^ViewsMgr::GetViewData(void)
+        {
+            return (this->_viewData);
+        }
+
         ViewData::ViewData(String ^name, String ^uniqueId,
                 DB::ViewType viewType, char isOnSheet)
             : _name{name}, _uniqueId{uniqueId}, _viewType{viewType}, _isOnSheet(isOnSheet)
@@ -129,6 +156,35 @@ namespace Esta
         char            ViewData::IsOnSheet(void)
         {
             return (this->_isOnSheet);
+        }
+
+        int     ViewData::CompareTo(System::Object ^obj)
+        {
+            ViewData    ^other;
+
+            other = dynamic_cast<ViewData ^>(obj);
+            if (other == nullptr)
+                return (-1);
+            return (String::Compare(this->GetName(), other->GetName()));
+        }
+
+        void    ViewsMgr::LogViewData(void)
+        {
+            System::Text::StringBuilder ^bldr;
+            CL::IEnumerator             ^it;
+            ViewData                    ^vd;
+
+            it = this->GetViewData()->GetEnumerator();
+            bldr = gcnew System::Text::StringBuilder();
+            while (it->MoveNext())
+            {
+                vd = dynamic_cast<ViewData ^>(it->Current);
+                bldr->AppendLine(String::Format("{0} {1} {2} {3}",
+                    vd->GetName(), vd->GetUniqueId(), 
+                    vd->GetViewType().ToString(), 
+                    vd->IsOnSheet() == 1 ? "On Sheet" : "Not on sheet"));
+            }
+            LOG(bldr->ToString());
         }
     }
 }
