@@ -1,26 +1,46 @@
-# imgtores Makefile
+# Makefile
+# $@ a target
+# $** (all dependent files in the dependency)
+# $? (all dependent files in the dependency with a later timestamp than the target)
+# @command (prevents display of the command)
+# !command (executes command for each dependent file if command uses $** or $?)
 
-CC = cl /c
+CC = cl
 LD = link
-CFLAGS = /clr /c /AI "%PROGRAMFILES(x86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1"
-LDFLAGS = /OUT:$(NAME).exe
 
-SRCS = genres.cpp
-OBJS = genres.obj
-NAME = genres
+CFLAGS = /clr /AI $(LIBS) /c /Zi
+LDFLAGS = /DLL 
 
-all : $(NAME)
+HDRS = ribbon.h
+SRCS = ribbon.cpp
+OBJS = ribbon.obj
+RES = icons.resources
+NAME = ribbon.dll
+
+NETASMS = "%PROGRAMFILES(x86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1"
+LIBS = "X:\kkozlov"
+DST = "\\192.168.10.167\bim\addins\esta"
+
+all : $(NAME) copy
 
 $(NAME) : $(OBJS)
-	$(LD) $(LDFLAGS) $(OBJS)
+	$(LD) $(LDFLAGS) /ASSEMBLYRESOURCE:$(RES) $? /OUT:$@
 
 $(OBJS)	: $(SRCS)
-	$(CC) $(CFLAGS) $(SRCS)
+	$(CC) $(CFLAGS) /AI $(NETASMS) $?
 
-.PHONY : all clean fclean re
+.PHONY : all clean fclean re objs
 
 clean :
-	del *.obj 
+	@del /q /f *.obj *.pdb
 
 fclean : clean
-	del *.exe	
+	@del /q /f $(NAME)
+
+re : fclean all
+
+objs : $(SRCS)
+	$(CC) $(CFLAGS) $**
+
+copy : 
+	copy /y $(NAME) $(DST)

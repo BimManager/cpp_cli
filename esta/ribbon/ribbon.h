@@ -5,7 +5,7 @@
  */
 
 #ifndef RIBBON_H
-# define RIBBON_
+# define RIBBON_H
 
 # using <mscorlib.dll>
 
@@ -19,20 +19,25 @@
 # using <RevitAPIUI.dll>
 
 # define LOG(msg) System::Diagnostics::EventLog::WriteEntry("Application", msg)
+# define GET_ASBL_NAME  System::Reflection::Assembly::GetExecutingAssembly()->GetName()->Name
+# define GET_PATH System::Reflection::Assembly::GetExecutingAssembly()->Location
+# define CONST_PATH(dll) GET_PATH->Replace(GET_ASBL_NAME, dll)
 
 # define TAB_NAME       "ESTA"
 # define RIBBON_NAME    "Esta Addins"
 # define RES_NAME       "icons"
 
-# define VM_DLL_PATH    System::String::Format("{0}\\Autodesk\\Revit\\Addins\\2019\\viewsmgr.dll", \
-                            System::Environment::GetFolderPath(System::Environment::SpecialFolder::ApplicationData))
+/* # define VM_DLL_PATH    System::String::Format("{0}\\Autodesk\\Revit\\Addins\\2019\\viewsmgr.dll", \
+                            System::Environment::GetFolderPath(System::Environment::SpecialFolder::ApplicationData))*/
+# define VM_DLL_PATH    CONST_PATH("viewsmgr")
 # define VM_BTN_NAME    "Views Manager"
 # define VM_ENTRY_POINT "Esta.ViewsMgr.Command"
 # define VM_ICON    "vm32x32"
 
 
-# define PM_DLL_PATH    System::String::Format("{0}\\Autodesk\\Revit\\Addins\\2019\\paramsmgr.dll", \
-                            System::Environment::GetFolderPath(System::Environment::SpecialFolder::ApplicationData))
+/* # define PM_DLL_PATH    System::String::Format("{0}\\Autodesk\\Revit\\Addins\\2019\\paramsmgr.dll", \
+                            System::Environment::GetFolderPath(System::Environment::SpecialFolder::ApplicationData))*/
+# define PM_DLL_PATH    CONST_PATH("paramsmgr")
 # define PM_BTN_NAME    "Params Manager"
 # define PM_ENTRY_POINT "Esta.Command"
 # define PM_ICON    "pm32x32"

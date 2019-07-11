@@ -85,8 +85,8 @@ namespace Esta
                 v = dynamic_cast<DB::View ^>(
                     this->_doc->GetElement((DB::ElementId ^)it->Current));
                 p = v->Parameter[DB::BuiltInParameter::VIEWER_SHEET_NUMBER];
-                if (p == nullptr)
-                    continue;
+                if (p == nullptr || v->ViewType == DB::ViewType::Legend)
+                    continue ;
                 this->_namesIds->Add(String::Format("{0};{1};{2}",
                    v->Name,
                    v->Id->ToString(),

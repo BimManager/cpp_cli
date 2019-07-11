@@ -57,6 +57,7 @@ namespace Esta
             this->_lbviews = gcnew Forms::CheckedListBox();
             this->_viewNames = viewNames;
             this->_lbviews->Dock = Forms::DockStyle::Fill;
+            /* this->_lbviews->SelectionMode = Forms::SelectionMode::MultiExtended; */
             this->_layout->Controls->Add(this->_lbviews, 0, 0);
             this->_layout->SetRowSpan(this->_lbviews, this->_layout->RowCount);
             this->FillListBox();

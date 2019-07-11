@@ -8,9 +8,12 @@
 # define RVT_TMPL_H
 
 # using <mscorlib.dll>
+# using <System.dll>
 
 # using <RevitAPI.dll>
 # using <RevitAPIUI.dll>
+
+# define LOG(msg) System::Diagnostics::EventLog::WriteEntry("Application", msg)
 
 namespace Rvt
 {
