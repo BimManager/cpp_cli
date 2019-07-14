@@ -67,6 +67,7 @@ namespace Esta
             this->ConvertViewsData(viewIds);
         }
 
+        /* name;id;notOnSheet;ViewType[Legend] */
         void    ViewsMgr::ConvertViewsData(
                     GCL::ICollection<DB::ElementId ^> ^viewIds)
         {
@@ -107,6 +108,27 @@ namespace Esta
                 if (cvId->Compare(id))
                     this->_doc->Delete(id);
             }
+        }
+
+        ViewData::ViewData(String ^name, String ^uniqueId,
+                DB::ViewType viewType, char isOnSheet)
+            : _name{name}, _uniqueId{uniqueId}, _viewType{viewType}, _isOnSheet(isOnSheet)
+        {}
+        String          ^ViewData::GetName(void)
+        {
+            return (this->_name);
+        }
+        String          ^ViewData::GetUniqueId(void)
+        {
+            return (this->_uniqueId);
+        }
+        DB::ViewType    ViewData::GetViewType(void)
+        {
+            return (this->_viewType);
+        }
+        char            ViewData::IsOnSheet(void)
+        {
+            return (this->_isOnSheet);
         }
     }
 }

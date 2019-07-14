@@ -30,7 +30,7 @@ namespace Esta
             this->_layout = gcnew Forms::TableLayoutPanel();
             this->_layout->Dock = Forms::DockStyle::Fill;
             this->_layout->ColumnCount = 2;
-            this->_layout->RowCount = 6;
+            this->_layout->RowCount = 7;
             this->_layout->RowStyles->Add(
                 gcnew Forms::RowStyle(Forms::SizeType::AutoSize));
             this->_layout->RowStyles->Add(
@@ -43,6 +43,8 @@ namespace Esta
                 gcnew Forms::RowStyle(Forms::SizeType::AutoSize));
             this->_layout->RowStyles->Add(
                 gcnew Forms::RowStyle(Forms::SizeType::AutoSize));
+            this->_layout->RowStyles->Add(
+                gcnew Forms::RowStyle(Forms::SizeType::AutoSize));                
             this->_layout->ColumnStyles->Add(
                 gcnew Forms::ColumnStyle(Forms::SizeType::Percent, 100));
             this->_layout->ColumnStyles->Add(
@@ -98,8 +100,11 @@ namespace Esta
                     &ViewsMgrForm::OnDeselectAllClicked));
             this->InitializeButton(this->_btnNotOnSheets, 3, 1,
                     "Not On Sheet", gcnew EventHandler(this,
-                    &ViewsMgrForm::OnNotOnSheetsClicked));                    
-            this->InitializeButton(this->_btnCancel, 4, 1,
+                    &ViewsMgrForm::OnNotOnSheetsClicked));
+            this->InitializeButton(this->_btnLegends, 4, 1,
+                    "Legends", gcnew EventHandler(this,
+                    &ViewsMgrForm::OnLegendsClicked));                                                        
+            this->InitializeButton(this->_btnCancel, 5, 1,
                     "Cancel", gcnew EventHandler(this,
                     &ViewsMgrForm::OnCancelClicked));                    
         }
@@ -165,6 +170,11 @@ namespace Esta
                 else
                     this->_lbviews->SetItemChecked(i, true);
             }
+        }
+
+        void    ViewsMgrForm::OnLegendsClicked(Object ^s, EventArgs ^e)
+        {
+            Forms::MessageBox::Show("Under Development");
         }
 
         void    ViewsMgrForm::OnCancelClicked(System::Object ^s, System::EventArgs ^e)
