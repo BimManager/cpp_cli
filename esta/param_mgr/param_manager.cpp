@@ -95,7 +95,7 @@ namespace Esta
         sw->Close();
     }
 
-    void    ParamManager::ImportParameters(String ^filepath)
+    int    ParamManager::ImportParameters(String ^filepath)
     {
         IO::StreamReader    ^sr;
         String              ^line;
@@ -105,6 +105,14 @@ namespace Esta
 
         spfile = this->_app->SharedParametersFilename;
         this->_app->SharedParametersFilename = filepath;
+        try 
+        {
+            this->_app->OpenSharedParameterFile();
+        }
+        catch (Autodesk::Revit::Exceptions::InternalException ^ex)
+        {
+            return (OPENING_FILE_ERROR);
+        }
         defs = _app->OpenSharedParameterFile()->Groups
                    ->Item[PARAM_GROUP_NAME]->Definitions;
         sr = gcnew IO::StreamReader(filepath, System::Text::Encoding::Unicode);
@@ -120,6 +128,7 @@ namespace Esta
             }
         }
         this->_app->SharedParametersFilename = spfile;
+        return (SUCCESS);
     }
 
     DB::CategorySet ^ParamManager::StringToCategories(System::String ^css, DB::Document ^doc)
@@ -192,9 +201,16 @@ namespace Esta
         {
             tr = gcnew DB::Transaction(this->_uidoc->Document);
             tr->Start("Binding shared parameters");
-            this->ImportParameters(args->GetFilepath());
-            if (tr->Commit() == DB::TransactionStatus::Committed)
+            if (this->ImportParameters(args->GetFilepath()) == SUCCESS) 
+            {
+                tr->Commit();
                 UI::TaskDialog::Show("Status", "The import has been completed.");
+                return ;
+            }
+            tr->RollBack();
+            UI::TaskDialog::Show("Error", "The import has failed because " + 
+                "the shared parameter file could not be processed or " + 
+                "is not a valid shared parameter file.");
         }
     }
 

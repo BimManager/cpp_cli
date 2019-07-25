@@ -42,6 +42,10 @@
 # define PARAM_DESCRIPTION_TXT  "N/A"
 # define FORMAT "PARAM\t{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}"
 
+# define SUCCESS                0
+# define OPENING_FILE_ERROR     1
+
+
 /* # define GROUP_NAME "Exported"
 # define PARAM_TYPE "Type"
 # define PARAM_NAME 0
@@ -86,7 +90,7 @@ namespace Esta
         ParamManager(AS::Application ^app, UI::UIDocument ^uidoc);
 
         void                    ExportParameters(String ^filename);
-        void                    ImportParameters(String ^filename);
+        int                    ImportParameters(String ^filename);
         void                    RespondToEvent(System::Object ^s, System::EventArgs ^e);
              
     private:
