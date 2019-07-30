@@ -27,6 +27,7 @@ namespace Firm
     using System::Configuration::Configuration;
     using System::Reflection::Assembly;
 
+    int  GetValueFromConfigFile(String ^key, String ^%out);
     Object  ^GetValueFromConfigFile(String ^key, int %err);
 
     namespace Commands
