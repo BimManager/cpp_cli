@@ -10,6 +10,7 @@
 # using <mscorlib.dll>
 # using <System.dll>
 # using <System.Configuration.dll>
+# using <System.Reflection.dll>
 
 # using <RevitAPI.dll>
 # using <RevitAPIUI.dll>
@@ -18,21 +19,29 @@
 
 # define LOG(msg) System::Diagnostics::EventLog::WriteEntry("Application", msg)
 
-namespace Commands
+namespace Firm
 {
+    using System::Object;
     using System::String;
     using System::Configuration::ConfigurationManager;
+    using System::Configuration::Configuration;
+    using System::Reflection::Assembly;
 
-    [Autodesk::Revit::Attributes::TransactionAttribute(
-        Autodesk::Revit::Attributes::TransactionMode::Manual)]
-    public ref class Command : Autodesk::Revit::UI::IExternalCommand
+    Object  ^GetValueFromConfigFile(String ^key, int %err);
+
+    namespace Commands
     {
-    public:
-        virtual Autodesk::Revit::UI::Result Execute(
-            Autodesk::Revit::UI::ExternalCommandData ^cmdData,
-            System::String ^%msg,
-            Autodesk::Revit::DB::ElementSet ^elements);
-    };
+        [Autodesk::Revit::Attributes::TransactionAttribute(
+            Autodesk::Revit::Attributes::TransactionMode::Manual)]
+        public ref class Command : Autodesk::Revit::UI::IExternalCommand
+        {
+        public:
+            virtual Autodesk::Revit::UI::Result Execute(
+                Autodesk::Revit::UI::ExternalCommandData ^cmdData,
+                System::String ^%msg,
+                Autodesk::Revit::DB::ElementSet ^elements);
+        };
+    }
 }
 
 #endif

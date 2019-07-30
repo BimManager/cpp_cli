@@ -3,7 +3,7 @@
     <AddIn Type="Command">
         <Assembly>rvttmp.dll</Assembly>
         <AddInId>239BD853-36E4-461f-9172-C5ACEDA3E721</AddInId>
-        <FullClassName>Commands.Command</FullClassName>
+        <FullClassName>Firm.Commands.Command</FullClassName>
         <Text>rvttmp</Text>
 	    <Description>C++/CLI</Description>
         <VendorId>ADSK</VendorId>

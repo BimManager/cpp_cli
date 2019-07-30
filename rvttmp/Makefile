@@ -8,7 +8,7 @@
 CC = cl
 LD = link
 
-CFLAGS = /clr /AI $(LIBS) /c /Zi
+CFLAGS = /clr /AI $(LIBS) /c /Zi /Wall /WL
 LDFLAGS = /DLL 
 
 PREFIX = rvttmp
@@ -21,13 +21,17 @@ NAME = $(PREFIX).dll
 NETASMS = "%PROGRAMFILES(x86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1"
 LIBS = "X:\kkozlov"
 
+DST = "x:\kkozlov"
+
 all : $(NAME)
 
 $(NAME) : $(OBJS)
-	$(LD) $(LDFLAGS) $? /OUT:$@
+	$(LD) $(LDFLAGS) $** /OUT:$@
 
 $(OBJS)	: $(SRCS)
-	$(CC) $(CFLAGS) $?
+	$(CC) $(CFLAGS) $**
+
+$(SRCS) : $(HDRS)
 
 .PHONY : all clean fclean re objs
 
@@ -41,3 +45,6 @@ re : fclean all
 
 objs : $(SRCS)
 	$(CC) $(CFLAGS) $**
+
+copy : all
+	forfiles /p . /m $(NAME) /c "cmd /c copy @path $(DST)"
