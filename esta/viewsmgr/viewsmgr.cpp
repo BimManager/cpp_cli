@@ -19,7 +19,6 @@ namespace Esta
             Autodesk::Revit::DB::ElementSet ^elements)
             {
  //               ViewsMgrForm    ^form;
-
                 ViewsMgr        ^mgr;
                 DB::Transaction ^tr;
                 DB::Document    ^doc;
@@ -33,13 +32,10 @@ namespace Esta
                                 //mgr->GetViewData());
                 form = gcnew MgrForm(mgr->GetViewData());   
                 form->ShowDialog();
-                /*tr = gcnew DB::Transaction(doc);
-                if (form->GetCheckedIndices() != nullptr)
-                {
-                    tr->Start("Delete views");
-                    mgr->DeleteElements(form->GetCheckedIndices());
-                    tr->Commit();
-                }*/
+                tr = gcnew DB::Transaction(doc);
+                tr->Start("Delete views");
+                mgr->DeleteViews(form->GetSelectedIds());
+                tr->Commit();
                 return (Autodesk::Revit::UI::Result::Succeeded);
             }
 
@@ -101,7 +97,7 @@ namespace Esta
             }
         }
 
-        void    ViewsMgr::DeleteElements(CL::IList ^indices)
+        /*void    ViewsMgr::DeleteElements(CL::IList ^indices)
         {
             CL::IEnumerator ^it;
             DB::ElementId   ^id;
@@ -116,6 +112,31 @@ namespace Esta
                 if (cvId->Compare(id))
                     this->_doc->Delete(id);
             }
+        }*/
+
+        void    ViewsMgr::DeleteViews(CL::Hashtable ^uniqueIds)
+        {
+            CL::IEnumerator ^it;
+            DB::Document    ^doc;
+            DB::Element     ^elem;
+            StringBuilder   ^bldr;
+
+            doc = this->_doc;
+            bldr = gcnew StringBuilder();
+            if (uniqueIds->ContainsKey(doc->ActiveView->UniqueId))
+                uniqueIds->Remove(doc->ActiveView->UniqueId);
+            it = uniqueIds->Keys->GetEnumerator();
+            while (it->MoveNext())
+            {
+                elem = doc->GetElement(static_cast<String ^>(it->Current));
+                if (elem != nullptr)
+                {
+                    bldr->AppendLine(static_cast<DB::View ^>(elem)->Name);
+                    doc->Delete(elem->Id);
+                }
+            }
+            UI::TaskDialog::Show("Status", String::Format(
+                "The following views have been discarded: \n{0}", bldr->ToString()));
         }
 
         void    ViewsMgr::ViewsToViewData(GCL::ICollection<DB::ElementId ^> ^viewIds)

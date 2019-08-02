@@ -18,9 +18,9 @@
     AddButtons();
  }
 
- ICollection   ^MgrForm::GetSelectedIds(void)
+ Hashtable   ^MgrForm::GetSelectedIds(void)
  {
-     return this->_selectedIds->Keys;
+     return this->_selectedIds;
  }
 
  void   MgrForm::InitializeComponent(void)
@@ -149,6 +149,7 @@
       bldr->AppendFormat("Id: {0}\n", (String ^)it->Current);
    }
    MessageBox::Show(bldr->ToString());
+   this->Close();
  }
 
  void    MgrForm::OnCheckBoxClicked(Object ^s, TreeViewEventArgs ^e)
@@ -170,9 +171,7 @@
 
    it = top->Nodes->GetEnumerator();
    while (it->MoveNext())
-   {
        ((ViewDataNode ^)it->Current)->Checked = checked;
-   }
  }
 
  void    MgrForm::OnNotOnSheetClicked(Object^ s, EventArgs ^e)

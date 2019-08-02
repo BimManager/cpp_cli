@@ -69,7 +69,7 @@ namespace Esta
         {
         public:
             MgrForm(IList ^viewData);
-            ICollection   ^GetSelectedIds(void);
+            Hashtable   ^GetSelectedIds(void);
 
         private:
             TableLayoutPanel    ^_table;

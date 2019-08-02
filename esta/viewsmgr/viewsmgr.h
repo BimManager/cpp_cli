@@ -26,8 +26,10 @@ namespace Esta
         namespace DGS = System::Diagnostics;
         namespace GCL = System::Collections::Generic;
         namespace DB = Autodesk::Revit::DB;
+        namespace UI = Autodesk::Revit::UI;
         namespace CL = System::Collections;
 
+        using System::Text::StringBuilder;
         typedef System::String  String;
 
         [Autodesk::Revit::Attributes::TransactionAttribute(
@@ -69,7 +71,8 @@ namespace Esta
             CL::SortedList  ^GetNamesIds(void);
             CL::ArrayList    ^GetViewData(void);
             void            Execute(void);
-            void            DeleteElements(CL::IList ^viewNames);
+            void            DeleteViews(CL::Hashtable ^uniqueIds);
+            //void            DeleteElements(CL::IList ^viewNames);
 
         private:
             DB::Document    ^_doc;
