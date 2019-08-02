@@ -1,5 +1,5 @@
 /*
- *  form1.h
+ *  prmsmgr_form.h
  */
  
 #ifndef FORM1_H
@@ -9,6 +9,9 @@
 # using <System.Windows.Forms.dll>
 # using <System.Drawing.dll>
 # using <System.dll>
+
+# using <RevitAPI.dll>
+# using <RevitAPIUI.dll>
 
 # define ACTION_IMPORT  0
 # define ACTION_EXPORT  1
@@ -33,6 +36,10 @@ namespace Esta
     {
         namespace Forms = System::Windows::Forms;
         namespace DWG = System::Drawing;
+        using Autodesk::Revit::UI::FileOpenDialog;
+        using Autodesk::Revit::UI::ItemSelectionDialogResult;
+        using Autodesk::Revit::DB::ModelPath;
+        using Autodesk::Revit::DB::ModelPathUtils;
 
         public ref class FilePicker : public Forms::Form
         {
@@ -43,19 +50,21 @@ namespace Esta
             virtual void OnDialogDismissed(EventData::DismissedDialogEventArgs ^e);
         private:
             Forms::TableLayoutPanel ^_tab;
-            Forms::Button   ^_btnImport;
-            Forms::Button   ^_btnExport;
-            Forms::Button   ^_btnCancel;
-            System::String  ^_filepath;
-
+            Forms::TextBox          ^_txtBox;
+            System::String          ^_filepath;
+            System::String          ^_modelpath;
+            
 
             void    InitializeComponent(void);
             void    InitializeTableLayout(Forms::TableLayoutPanel ^%tab);
-            void    InitializeButton(Forms::Button ^btn, System::String ^title,
-                        int row, int col, System::EventHandler ^handler);
+            void    InitializeButton(System::String ^title,
+                        int col, int row, System::EventHandler ^handler);
+            void    InitializeTextBox(void);
             void    InitializeButtons(void);
             void    BringUpSaveDialog(void);
             void    BringUpOpenDialog(void);
+
+            void    OnSelectModelClicked(System::Object ^s, System::EventArgs ^e);
             void    OnImportClicked(System::Object ^s, System::EventArgs ^e);
             void    OnExportClicked(System::Object ^s, System::EventArgs ^e);
             void    OnCancelClicked(System::Object ^s, System::EventArgs ^e);

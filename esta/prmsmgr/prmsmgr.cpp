@@ -1,9 +1,9 @@
 /*
- *  param_manager.cpp 
+ *  prmsmgr.cpp 
  */
 
-#include "param_manager.h"
-#include "form1.h"
+#include "prmsmgr.h"
+#include "prmsmgr_form.h"
 
 namespace Esta
 {

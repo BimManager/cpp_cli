@@ -11,15 +11,16 @@ LD = link
 CFLAGS = /clr /AI $(LIBS) /c /Zi
 LDFLAGS = /DLL 
 
-HDRS = param_manager.h form1.h
-SRCS = param_manager.cpp form1.cpp
-OBJS = param_manager.obj form1.obj
+HDRS = prmsmgr.h prmsmgr_form.h
+SRCS = prmsmgr.cpp prmsmgr_form.cpp
+OBJS = prmsmgr.obj prmsmgr_form.obj
 NAME = paramsmgr.dll
 
 NETASMS = "%PROGRAMFILES(x86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1"
 LIBS = "X:\kkozlov"
+DST = "x:\kkozlov"
 
-all : $(NAME)
+all : $(NAME) copy
 
 $(NAME) : $(OBJS)
 	$(LD) $(LDFLAGS) $? /OUT:$@
@@ -39,3 +40,6 @@ re : fclean all
 
 objs : $(SRCS)
 	$(CC) $(CFLAGS) $**
+
+copy : 
+	copy $(NAME) $(DST)
