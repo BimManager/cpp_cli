@@ -3,7 +3,8 @@
  */
 
 #include "viewsmgr.h"
-#include "viewsmgr_form.h"
+//#include "viewsmgr_form.h"
+#include "viewsmgr_form2.h"
 
 namespace Esta
 {
@@ -17,23 +18,28 @@ namespace Esta
             System::String ^%msg,
             Autodesk::Revit::DB::ElementSet ^elements)
             {
-                ViewsMgrForm    ^form;
+ //               ViewsMgrForm    ^form;
+
                 ViewsMgr        ^mgr;
                 DB::Transaction ^tr;
                 DB::Document    ^doc;
+                MgrForm         ^form;
 
                 doc = cmdData->Application->ActiveUIDocument->Document;
                 mgr = gcnew ViewsMgr(doc);
                 mgr->Execute();
-                form = gcnew ViewsMgrForm(mgr->GetNamesIds()->GetKeyList());
+
+                //form = gcnew ViewsMgrForm(mgr->GetNamesIds()->GetKeyList(),
+                                //mgr->GetViewData());
+                form = gcnew MgrForm(mgr->GetViewData());   
                 form->ShowDialog();
-                tr = gcnew DB::Transaction(doc);
+                /*tr = gcnew DB::Transaction(doc);
                 if (form->GetCheckedIndices() != nullptr)
                 {
                     tr->Start("Delete views");
                     mgr->DeleteElements(form->GetCheckedIndices());
                     tr->Commit();
-                }
+                }*/
                 return (Autodesk::Revit::UI::Result::Succeeded);
             }
 
@@ -130,6 +136,7 @@ namespace Esta
                         view->ViewType, IS_ON_SHEET(view));
                 this->_viewData->Add(vd);
             }
+            this->_viewData->Sort();
         }
 
         CL::ArrayList    ^ViewsMgr::GetViewData(void)
@@ -165,7 +172,9 @@ namespace Esta
             other = dynamic_cast<ViewData ^>(obj);
             if (other == nullptr)
                 return (-1);
-            return (String::Compare(this->GetName(), other->GetName()));
+            //return (String::Compare(this->GetName(), other->GetName()));
+            return (String::Compare(
+                this->GetViewType().ToString(), other->GetViewType().ToString()));
         }
 
         void    ViewsMgr::LogViewData(void)
@@ -184,7 +193,9 @@ namespace Esta
                     vd->GetViewType().ToString(), 
                     vd->IsOnSheet() == 1 ? "On Sheet" : "Not on sheet"));
             }
+#if DEBUG
             LOG(bldr->ToString());
+#endif          
         }
     }
 }

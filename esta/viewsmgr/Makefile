@@ -12,13 +12,14 @@ CFLAGS = /clr /AI $(LIBS) /c /Zi
 LDFLAGS = /DLL 
 
 HDRS = viewsmgr.h viewsmgr_form.h
-SRCS = viewsmgr.cpp viewsmgr_form.cpp
-OBJS = viewsmgr.obj viewsmgr_form.obj
+SRCS = viewsmgr.cpp viewsmgr_form2.cpp
+OBJS = viewsmgr.obj viewsmgr_form2.obj
 NAME = viewsmgr.dll
 
 NETASMS = "%PROGRAMFILES(x86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1"
 LIBS = "X:\kkozlov"
-DST = "X:\kkozlov"
+#DST = "\\192.168.10.167\addins\esta"
+DST = "\\192.168.10.167\users\kkozlov"
 
 all : $(NAME) copy
 

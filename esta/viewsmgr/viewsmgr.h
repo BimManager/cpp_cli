@@ -70,10 +70,11 @@ namespace Esta
             CL::ArrayList    ^GetViewData(void);
             void            Execute(void);
             void            DeleteElements(CL::IList ^viewNames);
+
         private:
             DB::Document    ^_doc;
             CL::SortedList  ^_namesIds;
-            CL::ArrayList  ^_viewData;
+            CL::ArrayList   ^_viewData;
 
             void    CollectAllViews(void);
             void    ConvertViewsData(
