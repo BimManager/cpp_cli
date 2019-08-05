@@ -8,9 +8,10 @@ namespace Esta
 {
     namespace Gui
     {
-        ViewsMgrForm::ViewsMgrForm(CL::IList ^names)
+        ViewsMgrForm::ViewsMgrForm(CL::IList ^names, CL::IList ^viewData)
         {
-            InitializeComponent();
+            //InitializeComponent();
+            InitializeComponent(viewData);
             InitializeTableLayoutPanel();
             InitializeListBox(names);
             InitializeButtons();
@@ -24,6 +25,13 @@ namespace Esta
             this->Text = L"Views Manager";
             this->MinimumSize = DWG::Size(300,300);
         }
+
+        void    ViewsMgrForm::InitializeComponent(CL::IList ^viewData)
+        {
+            InitializeComponent();
+            this->_viewData = viewData;
+        }
+
 
         void    ViewsMgrForm::InitializeTableLayoutPanel(void)
         {
@@ -60,7 +68,8 @@ namespace Esta
             /* this->_lbviews->SelectionMode = Forms::SelectionMode::MultiExtended; */
             this->_layout->Controls->Add(this->_lbviews, 0, 0);
             this->_layout->SetRowSpan(this->_lbviews, this->_layout->RowCount);
-            this->FillListBox();
+            //this->FillListBox();
+            this->FillListBoxVD();
         }
 
         void    ViewsMgrForm::FillListBox(void)
@@ -73,6 +82,19 @@ namespace Esta
             {
                 fields = ((String ^)it->Current)->Split(';');
                 this->_lbviews->Items->Add(fields[0]);
+            }
+        }
+
+        void    ViewsMgrForm::FillListBoxVD(void)
+        {
+            CL::IEnumerator ^it;
+            ViewData        ^vd;
+
+            it = this->_viewData->GetEnumerator();
+            while (it->MoveNext())
+            {
+                vd = (ViewData ^)it->Current;
+                this->_lbviews->Items->Add(vd->GetName());
             }
         }
 

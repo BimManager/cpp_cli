@@ -9,6 +9,8 @@
 # using <System.Windows.Forms.dll>
 # using <System.Drawing.dll>
 
+#include "viewsmgr.h"
+
 namespace Esta
 {
     namespace Gui
@@ -16,6 +18,8 @@ namespace Esta
         namespace Forms = System::Windows::Forms;
         namespace DWG = System::Drawing;
         namespace CL = System::Collections;
+
+        using namespace Esta::ViewsMgr;
 
         typedef System::String          String;
         typedef System::Object          Object;
@@ -26,7 +30,7 @@ namespace Esta
         {
         public:
             /* ViewsMgrForm(void); */
-            ViewsMgrForm(CL::IList ^names);
+            ViewsMgrForm(CL::IList ^names, CL::IList ^viewData);
 
             CL::IList   ^GetCheckedIndices(void);
         protected:
@@ -43,8 +47,10 @@ namespace Esta
             Forms::Button           ^_btnCancel;
             CL::IList               ^_viewNames;
             CL::IList               ^_checkedIndices;
+            CL::IList               ^_viewData;
 
             void    InitializeComponent(void);
+            void    InitializeComponent(CL::IList ^viewData);
             void    InitializeTableLayoutPanel(void);
             void    InitializeListBox(CL::IList ^viewNames);
             void    InitializeButtons(void);
@@ -53,6 +59,7 @@ namespace Esta
                     String ^text, System::EventHandler ^handler);
 
             void    FillListBox(void);    
+            void    FillListBoxVD(void);
             int     AreAllViewsChecked(void);                
 
             void    OnDeleteClicked(System::Object ^s, System::EventArgs ^e);
