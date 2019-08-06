@@ -11,7 +11,7 @@ LD = link
 CFLAGS = /nologo /clr /AI $(LIBS) /c /Zi /Wall /WL /DDEBUG
 LDFLAGS = /DLL /nologo
 
-PREFIX = rvttmp
+PREFIX = cmdtmp
 
 HDRS = $(PREFIX).h
 SRCS = $(PREFIX).cpp
