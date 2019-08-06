@@ -26,6 +26,7 @@ namespace Firm
     using System::Configuration::ConfigurationManager;
     using System::Configuration::Configuration;
     using System::Reflection::Assembly;
+    using System::Diagnostics::Debug;
 
     int  GetValueFromConfigFile(String ^key, String ^%out);
     Object  ^GetValueFromConfigFile(String ^key, int %err);

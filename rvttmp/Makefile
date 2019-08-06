@@ -8,8 +8,8 @@
 CC = cl
 LD = link
 
-CFLAGS = /clr /AI $(LIBS) /c /Zi /Wall /WL
-LDFLAGS = /DLL 
+CFLAGS = /nologo /clr /AI $(LIBS) /c /Zi /Wall /WL /DDEBUG
+LDFLAGS = /DLL /nologo
 
 PREFIX = rvttmp
 
@@ -23,7 +23,7 @@ LIBS = "X:\kkozlov"
 
 DST = "x:\kkozlov"
 
-all : $(NAME)
+all : $(NAME) copy
 
 $(NAME) : $(OBJS)
 	$(LD) $(LDFLAGS) $** /OUT:$@
@@ -46,5 +46,6 @@ re : fclean all
 objs : $(SRCS)
 	$(CC) $(CFLAGS) $**
 
-copy : all
-	forfiles /p . /m $(NAME) /c "cmd /c copy @path $(DST)"
+copy :
+	copy $(NAME) $(DST)
+	copy $(PREFIX).addin $(DST)
