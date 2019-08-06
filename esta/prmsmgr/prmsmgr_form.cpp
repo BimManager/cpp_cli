@@ -4,18 +4,26 @@
 
 #include "prmsmgr_form.h"
 
+using namespace Esta;
 using namespace Esta::Gui;
 using namespace Esta::EventData;
 
-DismissedDialogEventArgs::DismissedDialogEventArgs(System::String ^filepath, char action)
+DismissedDialogEventArgs::DismissedDialogEventArgs(
+    System::String ^filepath, ModelPath ^modelPath, char action)
 {
     this->_filepath = filepath;
+    this->_modelPath = modelPath;
     this->_action = action;
 }
 
 System::String  ^DismissedDialogEventArgs::GetFilepath(void)
 {
     return (this->_filepath);
+}
+
+ModelPath       ^DismissedDialogEventArgs::GetModelPath(void)
+{
+    return (this->_modelPath);
 }
 
 char  DismissedDialogEventArgs::GetAction(void)
@@ -82,26 +90,26 @@ void    FilePicker::InitializeTextBox(void)
 
 void    FilePicker::InitializeButton(System::String ^title,
             int col, int row, System::EventHandler ^handler)
-        {
-            Forms::Button   ^btn;
+{
+    Forms::Button   ^btn;
 
-            btn = gcnew Forms::Button();
-            btn->Text = title;
-            btn->Dock = Forms::DockStyle::Fill;
-            btn->Click += handler;
-            this->_tab->Controls->Add(btn, col, row);
-        }
+    btn = gcnew Forms::Button();
+    btn->Text = title;
+    btn->Dock = Forms::DockStyle::Fill;
+    btn->Click += handler;
+    this->_tab->Controls->Add(btn, col, row);
+}
 
 void    FilePicker::InitializeButtons(void)
 {
     InitializeButton(L"Select Model",
         0, 0, gcnew System::EventHandler(this, &FilePicker::OnSelectModelClicked));
+    InitializeButton(L"Cancel",
+        1, 0, gcnew System::EventHandler(this, &FilePicker::OnCancelClicked));
     InitializeButton(L"Import",
         0, 2, gcnew System::EventHandler(this, &FilePicker::OnImportClicked));
     InitializeButton(L"Export",
         1, 2, gcnew System::EventHandler(this, &FilePicker::OnExportClicked));
-    InitializeButton(L"Cancel",
-        1, 0, gcnew System::EventHandler(this, &FilePicker::OnCancelClicked));
 }
 
 void    FilePicker::OnDialogDismissed(DismissedDialogEventArgs ^e)
@@ -118,9 +126,7 @@ void    FilePicker::BringUpSaveDialog(void)
     saveDlg->DefaultExt = "txt";
     saveDlg->RestoreDirectory = 0;
     if (saveDlg->ShowDialog() == Forms::DialogResult::OK)
-    {
         this->_filepath = saveDlg->FileName;
-    }
 }
 
 void    FilePicker::BringUpOpenDialog(void)
@@ -131,47 +137,61 @@ void    FilePicker::BringUpOpenDialog(void)
     openDlg->CheckFileExists = true;
     openDlg->Filter = "txt files (*.txt)|*.txt";
     if (openDlg->ShowDialog() == Forms::DialogResult::OK)
-    {
         this->_filepath = openDlg->FileName;
-    }
 }
 
-void    FilePicker::OnSelectModelClicked(System::Object ^s, System::EventArgs ^e)
+void    FilePicker::OnSelectModelClicked(
+            System::Object ^s, System::EventArgs ^e)
 {
     FileOpenDialog  ^openDlg;
     ModelPath       ^path;
-
+    
     openDlg = gcnew FileOpenDialog("rvt files (*.rvt)|*.rvt");
     if (openDlg->Show() == ItemSelectionDialogResult::Confirmed)
     {
         path = openDlg->GetSelectedModelPath();
         this->_txtBox->Text = 
             ModelPathUtils::ConvertModelPathToUserVisiblePath(path);
+        this->_modelPath = path;
     }
+}
+
+void    FilePicker::ExportImport(char action1, char action2, VoidDelegateVoid ^pfn)
+{
+    if (this->_modelPath == nullptr) 
+    {
+        pfn();
+        if (String::Compare(this->_filepath, String::Empty))
+            HandleExportImport(action1);
+    }
+    else 
+        HandleExportImport(action2);
+    if (this->_modelPath != nullptr || 
+        String::Compare(this->_filepath, String::Empty))
+            this->Close();
+}
+
+void    FilePicker::HandleExportImport(char action)
+{
+    DismissedDialogEventArgs    ^args;
+
+    args = gcnew DismissedDialogEventArgs(this->_filepath,
+            this->_modelPath, action);
+    this->OnDialogDismissed(args);            
 }
 
 void FilePicker::OnImportClicked(System::Object ^s, System::EventArgs ^e)
 {
-    this->BringUpOpenDialog();
-    if (this->_filepath->Length)
-    {
-        this->Close();
-        this->OnDialogDismissed(
-            gcnew DismissedDialogEventArgs(
-                this->_filepath, ACTION_IMPORT));
-    }
+    ExportImport(ACTION_IMPORT_FROM_FILE,
+        ACTION_IMPORT_FROM_MODEL, 
+        gcnew VoidDelegateVoid(this, &FilePicker::BringUpOpenDialog));
 }
 
 void FilePicker::OnExportClicked(System::Object ^s, System::EventArgs ^e)
 {
-    this->BringUpSaveDialog();
-    if (this->_filepath->Length)
-    {
-        this->Close();
-        this->OnDialogDismissed(
-            gcnew DismissedDialogEventArgs(
-                this->_filepath, ACTION_EXPORT));
-    }
+    ExportImport(ACTION_EXPORT_TO_FILE,
+        ACTION_EXPORT_TO_MODEL,
+        gcnew VoidDelegateVoid(this, &FilePicker::BringUpSaveDialog));
 }
 
 void FilePicker::OnCancelClicked(System::Object ^s, System::EventArgs ^e)

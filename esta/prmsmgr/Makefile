@@ -8,7 +8,7 @@
 CC = cl
 LD = link
 
-CFLAGS = /clr /AI $(LIBS) /c /Zi
+CFLAGS = /clr /AI $(LIBS) /c /Zi /DDEBUG
 LDFLAGS = /DLL 
 
 HDRS = prmsmgr.h prmsmgr_form.h

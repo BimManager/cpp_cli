@@ -13,21 +13,28 @@
 # using <RevitAPI.dll>
 # using <RevitAPIUI.dll>
 
-# define ACTION_IMPORT  0
-# define ACTION_EXPORT  1
+# define ACTION_IMPORT_FROM_FILE    0
+# define ACTION_IMPORT_FROM_MODEL   1
+# define ACTION_EXPORT_TO_FILE      2
+# define ACTION_EXPORT_TO_MODEL     3
 
 namespace Esta
 {
+    using Autodesk::Revit::DB::ModelPath;
+    using System::String;
+
     namespace EventData
     {
         public ref class DismissedDialogEventArgs : public System::EventArgs
         {
         public:
-            DismissedDialogEventArgs(System::String ^filepath, char action);
-            System::String  ^GetFilepath(void);
+            DismissedDialogEventArgs(String ^filepath, ModelPath ^modelPath, char action);
+            ModelPath       ^GetModelPath(void);
+            String          ^GetFilepath(void);
             char            GetAction(void);
         private:
-            System::String  ^_filepath;
+            String          ^_filepath;
+            ModelPath       ^_modelPath;
             char            _action;
         };
     }
@@ -36,10 +43,13 @@ namespace Esta
     {
         namespace Forms = System::Windows::Forms;
         namespace DWG = System::Drawing;
+        using Forms::DialogResult;
+
         using Autodesk::Revit::UI::FileOpenDialog;
         using Autodesk::Revit::UI::ItemSelectionDialogResult;
-        using Autodesk::Revit::DB::ModelPath;
         using Autodesk::Revit::DB::ModelPathUtils;
+
+        public delegate void VoidDelegateVoid(void);
 
         public ref class FilePicker : public Forms::Form
         {
@@ -51,18 +61,19 @@ namespace Esta
         private:
             Forms::TableLayoutPanel ^_tab;
             Forms::TextBox          ^_txtBox;
-            System::String          ^_filepath;
-            System::String          ^_modelpath;
-            
+            String                  ^_filepath;
+            ModelPath               ^_modelPath;
 
             void    InitializeComponent(void);
             void    InitializeTableLayout(Forms::TableLayoutPanel ^%tab);
-            void    InitializeButton(System::String ^title,
+            void    InitializeButton(String ^title,
                         int col, int row, System::EventHandler ^handler);
             void    InitializeTextBox(void);
             void    InitializeButtons(void);
             void    BringUpSaveDialog(void);
             void    BringUpOpenDialog(void);
+            void    ExportImport(char action1, char action2, VoidDelegateVoid ^pfn);
+            void    HandleExportImport(char action);
 
             void    OnSelectModelClicked(System::Object ^s, System::EventArgs ^e);
             void    OnImportClicked(System::Object ^s, System::EventArgs ^e);

@@ -55,8 +55,11 @@
 # define PARAM_KIND 4
 # define PARAM_GUID 5 */
 
+# using <System.dll>
 # using <RevitAPI.dll>
 # using <RevitAPIUI.dll>
+
+using System::Diagnostics::Debug;
 
 namespace CL = System::Collections;
 namespace GCL = System::Collections::Generic;
@@ -69,9 +72,15 @@ namespace AS = Autodesk::Revit::ApplicationServices;
 typedef System::String String;
 typedef System::Text::StringBuilder StrBuilder;
 
+using Autodesk::Revit::ApplicationServices::Application;
+using Autodesk::Revit::DB::Document;
+using Autodesk::Revit::DB::ModelPath;
+
+
 namespace Esta
 {
     /* DB::DefinitionFile  ^CreateTempDefFile(AS::Application ^app); */
+    String  ^CreateTempFile(void);
 
     [Autodesk::Revit::Attributes::TransactionAttribute(
         Autodesk::Revit::Attributes::TransactionMode::Manual)]
@@ -87,25 +96,30 @@ namespace Esta
     ref class ParamManager
     {
     public:
-        ParamManager(AS::Application ^app, UI::UIDocument ^uidoc);
+        ParamManager(Application ^app, Document ^doc);
 
-        void                    ExportParameters(String ^filename);
-        int                    ImportParameters(String ^filename);
+        void                    ExportParameters(String ^filename, Document ^doc);
+        int                     ImportParameters(String ^filename, Application ^app, Document ^doc);
         void                    RespondToEvent(System::Object ^s, System::EventArgs ^e);
              
     private:
-        UI::UIDocument          ^_uidoc;
-        AS::Application         ^_app;
-        DB::Document            ^_doc;
+        Application ^_app;
+        Document    ^_doc;
 
+        void    ImportFromFile(String ^filepath, Document ^doc);
+        void    ExportToFile(String ^filepath, Document ^doc);
+        void    ImportFromModel(ModelPath ^modelpath, Document ^activeDoc);
+        //void    ExportToModel(ModelPath ^modelpath, Document ^activeDoc);
+
+        Document                ^GetDocument(ModelPath ^modelPath);
         void                    ExportParameter(DB::DefinitionBindingMapIterator ^it,
-                                    IO::StreamWriter ^sw);
-        /* void                    ExportFamilyParameter(DB::FamilyParameter ^param,
-                                    IO::StreamWriter ^sw);*/
-        void                    ExportFamilyParameter(DB::SharedParameterElement ^spElem,
-                                    IO::StreamWriter ^sw);                                    
-        void                    BindParameter(String ^line, DB::Definitions ^defs);
-        void                    BindFamilyParameter(String ^line, DB::Definitions ^def);
+                                    IO::StreamWriter ^sw, Document ^doc);
+        void                    ExportFamilyParameter(Document ^doc,
+                                    DB::SharedParameterElement ^spElem,
+                                    IO::StreamWriter ^sw); 
+        void                    BindParameter(String ^line, DB::Definitions ^defs, Document ^doc);
+        void                    BindFamilyParameter(Document ^doc,
+                                    String ^line, DB::Definitions ^def);
         static String           ^GenerateHeader(void);
         static String           ^CategoriesToString(DB::CategorySet ^set);
         static DB::CategorySet  ^StringToCategories(String ^css, DB::Document ^doc);
