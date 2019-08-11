@@ -6,12 +6,11 @@
 # !command (executes command for each dependent file if command uses $** or $?)
 
 CC = cl
-LD = link
-
 CFLAGS = /nologo /clr /AI $(LIBS) /c /Zi /Wall /WL /DDEBUG
-LDFLAGS = /DLL /nologo
+LD = link
+LDFLAGS = /DLL /NOLOGO
 
-PREFIX = cmdtmp
+PREFIX = cmdtmp #apptmp
 
 HDRS = $(PREFIX).h
 SRCS = $(PREFIX).cpp
@@ -19,11 +18,12 @@ OBJS = $(PREFIX).obj
 NAME = $(PREFIX).dll
 
 NETASMS = "%PROGRAMFILES(x86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1"
-LIBS = "X:\kkozlov"
+LIBS = "%PROGRAMFILES%\Autodesk\Revit 2019"
+#LIBS = "X:\kkozlov"
 
 DST = "x:\kkozlov"
 
-all : $(NAME) copy
+all : $(NAME) #copy
 
 $(NAME) : $(OBJS)
 	$(LD) $(LDFLAGS) $** /OUT:$@
@@ -47,5 +47,5 @@ objs : $(SRCS)
 	$(CC) $(CFLAGS) $**
 
 copy :
-	copy $(NAME) $(DST)
-	copy $(PREFIX).addin $(DST)
+	copy /y $(NAME) $(DST)
+	copy /y $(PREFIX).addin $(DST)

@@ -1,5 +1,5 @@
 /*
- *  rvttmp.h
+ *  cmdtmp.h
  *  A template for working
  *  with the Revit API
  */
@@ -34,7 +34,11 @@ namespace Firm
     namespace Commands
     {
         [Autodesk::Revit::Attributes::TransactionAttribute(
-            Autodesk::Revit::Attributes::TransactionMode::Manual)]
+            Autodesk::Revit::Attributes::TransactionMode::Manual)] /* ReadOnly */
+        [Autodesk::Revit::Attributes::RegenerationAttribute(
+            Autodesk::Revit::Attributes::RegenerationOption::Manual)] 
+        [Autodesk::Revit::Attributes::JournalingAttribute(
+            Autodesk::Revit::Attributes::JournalingMode::UsingCommandData)] /* NoCommandData */
         public ref class Command : Autodesk::Revit::UI::IExternalCommand
         {
         public:
