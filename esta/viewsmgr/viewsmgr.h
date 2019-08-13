@@ -21,20 +21,33 @@
 
 namespace Esta
 {
-    namespace ViewsMgr
+    namespace GCL = System::Collections::Generic;
+    namespace DB = Autodesk::Revit::DB;
+    namespace UI = Autodesk::Revit::UI;
+    namespace CL = System::Collections;
+
+    using System::Object;
+    using System::String;
+    using System::Text::StringBuilder;
+    using CL::Hashtable;
+    using CL::ArrayList;
+    using CL::SortedList;
+    using CL::IEnumerator;
+    using GCL::ICollection;
+
+    using DB::Document;
+    using DB::View;
+    using DB::ViewType;
+    using DB::Element;
+    using DB::Transaction;
+    using DB::ElementCategoryFilter;
+    using DB::FilteredElementCollector;
+
+    namespace Commands
     {
-        namespace DGS = System::Diagnostics;
-        namespace GCL = System::Collections::Generic;
-        namespace DB = Autodesk::Revit::DB;
-        namespace UI = Autodesk::Revit::UI;
-        namespace CL = System::Collections;
-
-        using System::Text::StringBuilder;
-        typedef System::String  String;
-
         [Autodesk::Revit::Attributes::TransactionAttribute(
             Autodesk::Revit::Attributes::TransactionMode::Manual)]
-        public ref class Command : Autodesk::Revit::UI::IExternalCommand
+        public ref class ViewsMgrCmd : Autodesk::Revit::UI::IExternalCommand
         {
         public:
             virtual Autodesk::Revit::UI::Result Execute(
@@ -42,24 +55,25 @@ namespace Esta
                 System::String ^%msg,
                 Autodesk::Revit::DB::ElementSet ^elements);
         };
+    }
 
+    namespace ViewsMgnt
+    {
         ref class ViewData : System::IComparable
         {
         public:
             ViewData(String ^name, String ^uniqueId,
-                DB::ViewType viewType, char isOnSheet);
-
+                ViewType viewType, char isOnSheet);
             String          ^GetName(void);
             String          ^GetUniqueId(void);
-            DB::ViewType    GetViewType(void);
+            ViewType        GetViewType(void);
             char            IsOnSheet(void);
-
-            virtual int     CompareTo(System::Object ^obj);
+            virtual int     CompareTo(Object ^obj);
 
         private:
             String          ^_name;
             String          ^_uniqueId;
-            DB::ViewType    _viewType;
+            ViewType        _viewType;
             char            _isOnSheet;
         };
 
@@ -68,22 +82,20 @@ namespace Esta
         public:
             ViewsMgr(DB::Document ^doc);
 
-            CL::SortedList  ^GetNamesIds(void);
-            CL::ArrayList    ^GetViewData(void);
+            SortedList      ^GetNamesIds(void);
+            ArrayList       ^GetViewData(void);
             void            Execute(void);
-            void            DeleteViews(CL::Hashtable ^uniqueIds);
-            //void            DeleteElements(CL::IList ^viewNames);
+            void            DeleteViews(Hashtable ^uniqueIds);
 
         private:
-            DB::Document    ^_doc;
-            CL::SortedList  ^_namesIds;
-            CL::ArrayList   ^_viewData;
+            Document    ^_doc;
+            SortedList  ^_namesIds;
+            ArrayList   ^_viewData;
 
-            void    CollectAllViews(void);
-            void    ConvertViewsData(
-                        GCL::ICollection<DB::ElementId ^> ^viewIds);
-            void    ViewsToViewData(GCL::ICollection<DB::ElementId ^> ^viewIds);
-            void    LogViewData(void);
+            GCL::ICollection<Element ^>    ^CollectAllViews(void);
+            void                            ViewsToViewData(
+                                                GCL::ICollection<Element ^> ^views);
+            void                            LogViewData(void);
         };
 
     }

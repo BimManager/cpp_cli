@@ -12,8 +12,8 @@ CFLAGS = /clr /AI $(LIBS) /c /Zi
 LDFLAGS = /DLL 
 
 HDRS = viewsmgr.h viewsmgr_form.h
-SRCS = viewsmgr.cpp viewsmgr_form2.cpp
-OBJS = viewsmgr.obj viewsmgr_form2.obj
+SRCS = viewsmgr.cpp viewsmgrForm.cpp
+OBJS = viewsmgr.obj viewsmgrForm.obj
 NAME = viewsmgr.dll
 
 NETASMS = "%PROGRAMFILES(x86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1"
