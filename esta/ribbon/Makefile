@@ -18,8 +18,10 @@ RES = icons.resources
 NAME = ribbon.dll
 
 NETASMS = "%PROGRAMFILES(x86)%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1"
-LIBS = "X:\kkozlov"
-DST = "\\192.168.10.167\bim\addins\esta"
+#LIBS = "X:\kkozlov"
+LIBS = "c:\users\public\cpp_cli\rvttmp"
+#DST = "\\192.168.10.167\bim\addins\esta"
+DST = "X:\kkozlov"
 
 all : $(NAME) copy
 

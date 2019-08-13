@@ -31,7 +31,7 @@
                             System::Environment::GetFolderPath(System::Environment::SpecialFolder::ApplicationData))*/
 # define VM_DLL_PATH    CONST_PATH("viewsmgr")
 # define VM_BTN_NAME    "Views Manager"
-# define VM_ENTRY_POINT "Esta.ViewsMgr.Command"
+# define VM_ENTRY_POINT "Esta.Commands.ViewsMgrCmd"
 # define VM_ICON    "vm32x32"
 
 
@@ -39,7 +39,7 @@
                             System::Environment::GetFolderPath(System::Environment::SpecialFolder::ApplicationData))*/
 # define PM_DLL_PATH    CONST_PATH("paramsmgr")
 # define PM_BTN_NAME    "Params Manager"
-# define PM_ENTRY_POINT "Esta.Command"
+# define PM_ENTRY_POINT "Esta.Commands.PrmMgrCmd"
 # define PM_ICON    "pm32x32"
 
 namespace Esta
