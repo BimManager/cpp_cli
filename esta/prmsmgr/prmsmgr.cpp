@@ -6,8 +6,10 @@
 #include "prmsmgr_form.h"
 
 using namespace Esta;
+using namespace Esta::Commands;
+using namespace Esta::ParametersMgnt;
 
-UI::Result Command::Execute(UI::ExternalCommandData ^commandData,
+UI::Result PrmMgrCmd::Execute(UI::ExternalCommandData ^commandData,
     String ^%message, DB::ElementSet ^elements)
 {
     ParamManager        ^mgr;
