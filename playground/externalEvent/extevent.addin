@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+    <AddIn Type="Application">
+        <Name>External Event Application</Name>
+        <Assembly>extevent.dll</Assembly>
+        <AddInId>239BD855-36E7-461f-9172-C5ACEDA3E721</AddInId>
+        <FullClassName>Firm.Applications.Application</FullClassName>
+        <VendorId>KKZ</VendorId>
+        <VendorDescription>N/A</VendorDescription>   
+    </AddIn>
+    <AddIn Type="Command">
+        <Text>External Event Command</Text>
+        <Assembly>extevent.dll</Assembly>
+        <AddInId>239BD853-36E8-461f-9172-C5ACEDA3E721</AddInId>
+        <FullClassName>Firm.Commands.Command</FullClassName>
+	    <Description>External Event</Description>
+        <VendorId>KKZ</VendorId>
+        <VendorDescription>N/A</VendorDescription>   
+    </AddIn>
+</RevitAddIns>
