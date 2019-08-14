@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+    <AddIn Type="Command">
+        <Text>IFC Export</Text>
+        <Assembly>ifcexp.dll</Assembly>
+        <AddInId>239BD773-36E4-461f-9172-C5ACEDA3E721</AddInId>
+        <FullClassName>Esta.Commands.IfcExportCmd</FullClassName>
+	    <Description>Batch export of Revit files to IFC</Description>
+        <VendorId>KKZ</VendorId>
+        <VendorDescription>N/A</VendorDescription>
+    </AddIn>
+</RevitAddIns>
