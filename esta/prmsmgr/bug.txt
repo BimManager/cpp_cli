@@ -1,0 +1,9 @@
+# This is a Revit shared parameter file.
+# Do not edit manually.
+*META	VERSION	MINVERSION
+META	2	1
+*GROUP	ID	NAME
+GROUP	1	Exported Parameters
+*PARAM	GUID	NAME	DATATYPE	DATACATEGORY	GROUP	VISIBLE	DESCRIPTION	USERMODIFIABLE	PARAMETERGROUP	KIND	CATEGORIES	VARIESACROSSGROUPS
+PARAM	3d4f16d7-7f83-4522-a1e5-ef2dd847a082	ADSK_Масса на единицу длины	MASS_PER_UNIT_LENGTH		1	1	N/A	1	PG_DATA	T	OST_FabricReinforcementWire;OST_Rebar	0
+PARAM	3d4f16d7-7f83-4522-a1e5-ef2dd847a082	ADSK_Масса на единицу длины	MassPerUnitLength		1	1	N/A	1	PG_DATA	T	OST_FabricReinforcementWire;OST_Rebar	0
