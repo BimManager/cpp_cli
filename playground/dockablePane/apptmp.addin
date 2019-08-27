@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+    <AddIn Type="Application">
+        <Name>Dockable Pane</Name>
+        <Assembly>a.dll</Assembly>
+        <AddInId>239BD823-36E7-461f-9172-C5ACEDA3E721</AddInId>
+        <FullClassName>Firm.Applications.Application</FullClassName>
+        <VendorId>KKZ</VendorId>
+        <VendorDescription>N/A</VendorDescription>   
+    </AddIn>
+</RevitAddIns>
