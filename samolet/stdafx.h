@@ -7,6 +7,9 @@
 
 # using <System.dll>
 # using <System.Configuration.dll>
+#ifdef DEBUG
+# using <System.Diagnostics.Debug.dll>
+#endif
 
 /* WinForms */
 # using <System.Windows.Forms.dll>
@@ -17,9 +20,6 @@
 # using <PresentationFramework.dll>
 # using <WindowsBase.dll>
 # using <System.Xaml.dll>
-#ifdef DEBUG
-# using <System.Diagnostics.Debug.dll>
-#endif
 
 /* Revit API */
 # using <RevitAPI.dll>
@@ -30,27 +30,28 @@
 namespace Samolet 
 {
     using namespace System;
-    using namespace System::Reflection;
-    using namespace System::Resources;
-    using namespace System::IO;
-    namespace CF = System::Configuration;
+    namespace REF = System::Reflection;
+    namespace RS = System::Resources;
+    namespace IO = System::IO;
 
+    namespace CF = System::Configuration;
     namespace CL = System::Collections;
-    using namespace System::Collections::Generic;
+    namespace CLG = System::Collections::Generic;
+    
     #ifdef DEBUG
-    using namespace System::Diagnostics;    
+    using System::Diagnostics::Debug;
     #endif
-    namespace DB = Autodesk::Revit::DB;
-    namespace UI = Autodesk::Revit::UI;
-    namespace SEL = UI::Selection;
-    using namespace Autodesk::Revit::DB;
-    using namespace Autodesk::Revit::UI;
-    using namespace Autodesk::Revit::ApplicationServices;
-    using namespace Autodesk::Revit::Attributes;
 
     namespace Forms = System::Windows::Forms;
     namespace Dwg = System::Drawing;
-    using System::Windows::Media::Imaging::BitmapImage;
+    namespace IMG = System::Windows::Media::Imaging;
+    //using System::Windows::Media::Imaging::BitmapImage;
+
+    namespace DB = Autodesk::Revit::DB;
+    namespace UI = Autodesk::Revit::UI;
+    namespace AS = Autodesk::Revit::ApplicationServices;
+    namespace ATT = Autodesk::Revit::Attributes;
+    namespace SEL = UI::Selection;
 }
 
  #endif

@@ -1,12 +1,12 @@
 /*                                  
- * setParamsCmdForm.h
+ * selValuesCmdForm.h
  */
 
-#ifndef SET_PARAMS_CMD_FORM
-# define SET_PARAMS_CMD_FORM
+#ifndef SEL_VALUES_CMD_FORM_H
+# define SEL_VALUES_CMD_FORM_H
 
 # include "stdafx.h"
-# include "setSpCmd.h"
+# include "selValuesCmd.h"
 
 namespace Samolet
 {

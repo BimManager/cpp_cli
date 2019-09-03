@@ -1,9 +1,10 @@
 /*
- *  setSpCmd.cpp
+ *  selValuesCmd.cpp
  */
 
-#include "setSpCmd.h" 
-#include "setParamsCmdForm.h"
+#include "selValuesCmd.h" 
+#include "selValuesCmdForm.h"
+#include "utils.h"
 
 using namespace Samolet;
 using namespace Samolet::Commands;
@@ -12,7 +13,7 @@ ValuesSet::ValuesSet(String ^name, array<String^> ^values)
 {
     this->_name = name;
     this->_values = values;
-    this->_params = gcnew LinkedList<DB::Parameter^>();
+    this->_params = gcnew CLG::LinkedList<DB::Parameter^>();
     this->_paramsCount = 0;
 }
 
@@ -26,12 +27,12 @@ array<String^>  ^ValuesSet::GetValues(void)
     return (this->_values);
 }
 
-LinkedList<DB::Parameter^>   ^ValuesSet::GetParameters(void)
+CLG::LinkedList<DB::Parameter^>   ^ValuesSet::GetParameters(void)
 {
     return (this->_params);
 }
 
-int ValuesSet::GetCount(void)
+size_t ValuesSet::GetCount(void)
 {
     return (this->_paramsCount);
 }
@@ -72,74 +73,27 @@ int ValuesSet::CompareTo(Object ^other)
 bool    AvailableUponSelection::IsCommandAvailable(
             UI::UIApplication ^uiapp, DB::CategorySet ^selCats)
 {
+    selCats = nullptr;
     if (uiapp->ActiveUIDocument->Selection->GetElementIds()->Count)
         return (true);
     return (false);
 }            
 
-IList<Parameter^>   ^SetSpCmd::GetSps(UI::UIDocument ^uidoc)
-{
-    CL::IEnumerator         ^idIt;
-    CL::IEnumerator         ^pIt;
-    IList<DB::Parameter^>   ^sps;
-    DB::Parameter           ^p;
-    DB::Document            ^doc;
-
-    doc = uidoc->Document;
-    idIt = uidoc->Selection->GetElementIds()->GetEnumerator();
-    sps = gcnew List<DB::Parameter^>();
-    while (idIt->MoveNext())
-    {
-        pIt = (doc->GetElement(
-            dynamic_cast<DB::ElementId^>(idIt->Current)))
-            ->Parameters->GetEnumerator();
-        while (pIt->MoveNext())
-        {
-            p = dynamic_cast<Parameter^>(pIt->Current);
-            if (p->IsShared)
-            {
-            #ifdef DEBUG
-                Debug::WriteLine(p->GUID);
-                LOG(p->Definition->Name + ": " + p->GUID.ToString());
-            #endif
-                sps->Add(p);
-            }
-        }
-    }
-    return (sps);
-}
-
-int  Utils::GetValueFromConfigFile(String ^key, String ^%out)
-{
-    CF::Configuration   ^config;
-    int                  ret;
-
-    config = CF::ConfigurationManager::OpenExeConfiguration(
-            Assembly::GetExecutingAssembly()->Location);
-    if (config->HasFile)
-    {  
-        ret = config->AppSettings->Settings[key] != nullptr ? 0 : 1;
-        if (!ret) 
-            out = config->AppSettings->Settings[key]->Value;
-    }
-    else
-        ret = 2;
-    return (ret);
-}
-
 String      ^SetSpCmd::LocateParamsSource(void)
 {
-    Assembly    ^asmb;
-    String      ^filePath;
-    FileInfo    ^fi;
+    REF::Assembly   ^asmb;
+    String          ^filePath;
+    IO::FileInfo    ^fi;
     
-    asmb = Assembly::GetExecutingAssembly();
+    asmb = REF::Assembly::GetExecutingAssembly();
     /*filePath = String::Format("{0}\\{1}", asmb->Location,
                 asmb->GetName()->Name->Replace(".dll", ".txt"));*/
-    if (Utils::GetValueFromConfigFile("filePath", filePath))
+    if (Utils::ConfigFileManager::
+            GetValueFromConfigFile("filePath", filePath))
     {
     #ifdef DEBUG
-        Debug::WriteLine(String::Format("Cannot get the value from the config file."));
+        Debug::WriteLine(String::Format(
+            "Cannot get the value from the config file."));
     #endif
         return (nullptr);
     }
@@ -147,7 +101,7 @@ String      ^SetSpCmd::LocateParamsSource(void)
         Debug::WriteLine(String::Format("filePath: {0}",
             filePath));
     #endif
-    fi = gcnew FileInfo(filePath);
+    fi = gcnew IO::FileInfo(filePath);
     if (!fi->Exists)
         return (nullptr);
     return (filePath);
@@ -185,33 +139,27 @@ void    SetSpCmd::ExtractParameters(UI::UIDocument ^uidoc,
 {
     CL::IEnumerator         ^idIt;
     CL::IEnumerator         ^setIt;
-    DB::Element             ^e;
     DB::Parameter           ^p;
     DB::Document            ^doc;
     ValuesSet               ^set;
-    int                     i;
 
     doc = uidoc->Document;
-    ValuesSet::SetElemCount(uidoc->Selection->GetElementIds()->Count);
+    ValuesSet::SetElemCount((size_t)uidoc->Selection->GetElementIds()->Count);
     idIt = uidoc->Selection->GetElementIds()->GetEnumerator();
     setIt = sets->GetEnumerator();
     while (setIt->MoveNext())
-    //i = sets->Length;
-    //while (i--)
     {
         set = dynamic_cast<ValuesSet^>(setIt->Current);
         while (idIt->MoveNext())
         {
-            e = doc->GetElement(dynamic_cast<DB::ElementId^>(idIt->Current));
-            //p = e->LookupParameter(sets[i]->GetName());
-            p = e->LookupParameter(set->GetName());
+            p = doc->GetElement(dynamic_cast<DB::ElementId^>(idIt->Current))
+                ->LookupParameter(set->GetName());
             if (p != nullptr)
             {
             #ifdef DEBUG
                 Debug::WriteLine(String::Format("[RVT] Actual Param:{0}, Name:{1}",
                     p->Definition->Name, set->GetName()));
             #endif
-                // sets[i]->AddParameter(p);
                 set->AddParameter(p);
             }
         }
@@ -288,13 +236,13 @@ CL::Hashtable   ^ParamsSourceParser::ParseTxtFile(String ^filePath)
    return (pmtsVals);
 }
 
-Result  SetSpCmd::CarryOutCmd(ExternalCommandData ^data, 
-            String ^%msg, ElementSet ^elements)
+UI::Result  SetSpCmd::CarryOutCmd(UI::ExternalCommandData ^data, 
+                String ^%msg, DB::ElementSet ^elements)
 {
-    UIDocument      ^uidoc;
-    Document        ^doc;
+    UI::UIDocument      ^uidoc;
+    DB::Document        ^doc;
     Gui::SelectionForm  ^form;
-    String          ^filePath;
+    String              ^filePath;
     array<ValuesSet^>   ^sets;
     CL::Hashtable       ^ht;
 
@@ -308,7 +256,6 @@ Result  SetSpCmd::CarryOutCmd(ExternalCommandData ^data,
     filePath = this->LocateParamsSource();
     sets = this->FillValuesSets(filePath);
     this->ExtractParameters(uidoc, sets);
-    //form = gcnew Gui::SelectionForm(ParamsSourceParser::ParseTxtFile(filePath));
     form = gcnew Gui::SelectionForm(sets);
     form->ShowDialog();
     ht = form->GetSelected();
@@ -324,10 +271,11 @@ Result  SetSpCmd::CarryOutCmd(ExternalCommandData ^data,
     }
     #endif
     SetValues(doc, ht, sets);
-    return (Result::Succeeded);
+    return (UI::Result::Succeeded);
 }
 
-Result  SetSpCmd::Execute(ExternalCommandData ^data, String ^%msg, ElementSet ^elements)
+UI::Result  SetSpCmd::Execute(UI::ExternalCommandData ^data, 
+                String ^%msg, DB::ElementSet ^elements)
 {    
     return (CarryOutCmd(data, msg, elements));
 }

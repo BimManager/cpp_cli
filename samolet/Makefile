@@ -7,9 +7,9 @@ LDFLAGS = /NOLOGO /DLL /SUBSYSTEM:WINDOWS /MACHINE:X64 \
 	/LIBPATH:$(LIB1) /LIBPATH:$(LIB2) /LIBPATH:$(LIB3) /LIBPATH:$(LIB5) \
 	/ASSEMBLYRESOURCE:$(RSFILE)
 
-HDRS = stdafx.h app.h setSpCmd.h setParamsCmdForm.h 
-SRCS = app.cpp setSpCmd.cpp setParamsCmdForm.cpp
-OBJS = app.obj setSpCmd.obj setParamsCmdForm.obj
+HDRS = stdafx.h utils.h app.h selValuesCmd.h selValuesCmdForm.h 
+SRCS = app.cpp utils.cpp selValuesCmd.cpp selValuesCmdForm.cpp
+OBJS = app.obj utils.obj selValuesCmd.obj selValuesCmdForm.obj
 NAME = samolet.dll
 
 RSDIR = resources

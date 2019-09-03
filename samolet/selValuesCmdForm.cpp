@@ -1,8 +1,8 @@
 /*
- *  setParamsCmdForm.h
+ *  selValuesCmdForm.cpp
  */
 
-#include "setParamsCmdForm.h"
+#include "selValuesCmdForm.h"
 
 using namespace Samolet;
 using namespace Samolet::Gui;

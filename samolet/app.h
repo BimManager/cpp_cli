@@ -23,35 +23,19 @@ void    setupDebugging(void)
 
 namespace Samolet
 {
-    using System::Windows::Media::Imaging::BitmapImage;
-
     namespace Applications
     {
-        public ref class MainApp : IExternalApplication
+        public ref class MainApp : UI::IExternalApplication
         {
         public:
-            virtual Result  OnStartup(UIControlledApplication ^uiapp);
-            virtual Result  OnShutdown(UIControlledApplication ^uiapp);
-        
+            virtual UI::Result  OnStartup(UI::UIControlledApplication ^uiapp);
+            virtual UI::Result  OnShutdown(UI::UIControlledApplication ^uiapp);
         private:
-            void            AddButton(RibbonPanel ^ribbon,
+            void            AddButton(UI::RibbonPanel ^ribbon,
                                 String ^iconName, String ^btnName,
                                 String ^entryPnt);
         }; /* MainApp */
     } /* Applications */
-
-    namespace Resources
-    {
-        using namespace System::IO;
-
-        public ref class Utils
-        {
-        public:
-        static MemoryStream ^GetMemoryStream(Assembly ^asmb,
-                                String ^rsName, String ^imgName);
-        static BitmapImage  ^MemoryStreamToImage(MemoryStream ^ms);
-        }; /* Utils */
-    } /* Resources */
 }
 
 #endif
