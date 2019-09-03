@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+    <AddIn Type="Application">
+    <Assembly>samolet.dll</Assembly>
+    <Name>Samolet</Name>
+    <AddInId>FE9C4D91-4B23-464D-BCC4-555939AF8DC0</AddInId>
+    <FullClassName>Samolet.Applications.MainApp</FullClassName>
+    <VendorId>KKZ</VendorId>
+    </AddIn>
+</RevitAddIns>
