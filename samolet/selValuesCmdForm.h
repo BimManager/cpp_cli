@@ -19,6 +19,7 @@ namespace Samolet
         public:
             SelectionForm(CL::Hashtable^ prmsVals);
             SelectionForm(array<ValuesSet^> ^sets);
+
             CL::Hashtable   ^GetSelected(void);
         private:
             CL::Hashtable           ^_pmtsVals;

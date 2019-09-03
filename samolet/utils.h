@@ -23,7 +23,13 @@ namespace Samolet
         {
         public:
             static int  GetValueFromConfigFile(String ^key, String ^%out);
-        };
+        }; /* ConfigFileManager */
+
+        public ref class RvtParamManager
+        {
+        public:
+            static void SetStringValue(DB::Parameter ^par, String ^valAsStr);
+        }; /* RvtParamManager */
     } /* Utils */    
 }
 

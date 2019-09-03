@@ -177,30 +177,32 @@ void    SetSpCmd::ExtractParameters(UI::UIDocument ^uidoc,
     #endif
 }
 
-void    SetSpCmd::SetValues(DB::Document ^doc, CL::Hashtable ^selected, array<ValuesSet^> ^sets)
+void    SetSpCmd::SetValues(DB::Document ^doc, 
+            CL::Hashtable ^selected, array<ValuesSet^> ^sets)
 {
     DB::Transaction ^tr;
-    CL::IEnumerator ^it;
+    CL::IEnumerator ^setIt;
     CL::IEnumerator ^pIt;
     ValuesSet       ^set;
-    DB::Parameter   ^p;
     String          ^val;
 
-    it = sets->GetEnumerator();
+    if (!selected->Count)
+        return ;
+    setIt = sets->GetEnumerator();
     tr = gcnew DB::Transaction(doc);
     tr->Start("Set values");
-    while (it->MoveNext())
+    while (setIt->MoveNext())
     {
-        set = dynamic_cast<ValuesSet^>(it->Current);
+        set = dynamic_cast<ValuesSet^>(setIt->Current);
         if (set->GetCount())
         {
-            val = set->GetName();
+            val = dynamic_cast<String^>(selected[set->GetName()]);
+            if (!val)
+                continue ;
             pIt = set->GetParameters()->GetEnumerator();
             while (pIt->MoveNext())
-            {
-                p = dynamic_cast<DB::Parameter^>(pIt->Current);
-                p->Set(dynamic_cast<String ^>(selected[val]));
-            }
+                Utils::RvtParamManager::SetStringValue(
+                    dynamic_cast<DB::Parameter^>(pIt->Current), val);
         }
     }
     tr->Commit();
@@ -226,7 +228,8 @@ CL::Hashtable   ^ParamsSourceParser::ParseTxtFile(String ^filePath)
          if (parts->Length != 2)
             continue;
          vals = parts[1]->Split(';');
-         pmtsVals->Add(parts[0], vals);
+         if (!pmtsVals->Contains(parts[0]))
+            pmtsVals->Add(parts[0], vals);
       }
    }
    finally

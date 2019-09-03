@@ -11,7 +11,7 @@ SelectionForm::SelectionForm(CL::Hashtable ^pmtsVals)
 {
    this->_pmtsVals = pmtsVals;
    this->_selected = gcnew CL::Hashtable();
-   InitializeComponent();
+   //InitializeComponent();
    SetupOuterPanel();
    SetupPanel();
    PopulateView();
@@ -29,14 +29,10 @@ SelectionForm::SelectionForm(array<ValuesSet^> ^sets)
 
 void   SelectionForm::InitializeComponent(void)
 {
-   int   h;
-
-   //h = this->_pmtsVals->Keys->Count * 45 + 45;
    this->AutoSizeMode = Forms::AutoSizeMode::GrowAndShrink;
-   //h = 150;
-   this->Text = "Set Parameters";
-   //this->Size = Dwg::Size(300, h);
-   this->MinimumSize = Dwg::Size(300, 200);
+   this->Text = "Select Values";
+   this->Size = Dwg::Size(300, 35);
+   this->MinimumSize = Dwg::Size(300, 0);
    //this->AutoSizeMode = Forms::AutoSizeMode::GrowAndShrink;
    this->CenterToScreen();
 }
@@ -45,6 +41,7 @@ void    SelectionForm::AddRow(String ^pn, array<String^> ^vals, int row)
 {
    Forms::Label      ^lb;
    Forms::ComboBox   ^cbx;
+   Forms::AutoCompleteStringCollection ^strCol;
 
    lb = gcnew Forms::Label();
    lb->Text = pn;
@@ -54,9 +51,15 @@ void    SelectionForm::AddRow(String ^pn, array<String^> ^vals, int row)
    cbx->Name = pn;
    cbx->Items->AddRange(vals);
    cbx->SelectedIndex = 0;
-   //cbx->DropDownStyle = Forms::ComboBoxStyle::DropDownList;
+   cbx->AutoCompleteMode = Forms::AutoCompleteMode::SuggestAppend;
+   cbx->DropDownStyle = Forms::ComboBoxStyle::DropDown;
+   cbx->AutoCompleteSource = Forms::AutoCompleteSource::CustomSource;
+   strCol = gcnew Forms::AutoCompleteStringCollection();
+   strCol->AddRange(vals);
+   cbx->AutoCompleteCustomSource = strCol;
    cbx->Dock = Forms::DockStyle::Fill;
    this->_panel->Controls->Add(cbx, 1, row);
+   this->Height += cbx->Height + 15;
 }
 
 void    SelectionForm::SetupOuterPanel(void)
@@ -197,5 +200,6 @@ void    SelectionForm::OnOkClicked(Object ^s, EventArgs ^e)
 
 void    SelectionForm::OnCancelClicked(Object ^s, EventArgs ^e)
 {
+   this->_selected->Clear();
    this->Close();
 }

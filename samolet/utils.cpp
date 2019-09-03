@@ -46,3 +46,32 @@ int  Utils::ConfigFileManager::GetValueFromConfigFile(String ^key, String ^%out)
         ret = 2;
     return (ret);
 }
+
+void Utils::RvtParamManager::SetStringValue(DB::Parameter ^par, String ^valAsStr)
+{
+    switch (par->StorageType)
+    {
+        case DB::StorageType::Integer:
+            int valAsInt;
+            if (Int32::TryParse(valAsStr, valAsInt))
+                par->Set(valAsInt);
+            break ;
+        case DB::StorageType::Double:
+            double valAsDbl;
+            if (Double::TryParse(valAsStr, valAsDbl))
+                par->Set(valAsDbl);
+            break ;
+        case DB::StorageType::String:
+            par->Set(valAsStr);
+            break ;
+        case DB::StorageType::ElementId:
+            int idAsInt;
+            if (Int32::TryParse(valAsStr, idAsInt))
+                par->Set(gcnew DB::ElementId(idAsInt));
+            break ;
+        case DB::StorageType::None:
+            break ;
+        default:
+            ;
+    }   
+}
