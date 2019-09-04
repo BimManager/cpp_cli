@@ -33,4 +33,13 @@ namespace Samolet
     } /* Utils */    
 }
 
+/* #ifdef DEBUG
+void    setupDebugging(void)
+{
+    System::Diagnostics::Debug::Listeners->Add(
+        gcnew System::Diagnostics::TextWriterTraceListener(
+            System::Console::Out));
+}
+#endif */
+
 #endif

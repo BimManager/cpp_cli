@@ -12,15 +12,6 @@
 
 # define RS_NAME "icons"
 
-/* #ifdef DEBUG
-void    setupDebugging(void)
-{
-    System::Diagnostics::Debug::Listeners->Add(
-        gcnew System::Diagnostics::TextWriterTraceListener(
-            System::Console::Out));
-}
-#endif */
-
 namespace Samolet
 {
     namespace Applications
@@ -31,9 +22,13 @@ namespace Samolet
             virtual UI::Result  OnStartup(UI::UIControlledApplication ^uiapp);
             virtual UI::Result  OnShutdown(UI::UIControlledApplication ^uiapp);
         private:
-            void            AddButton(UI::RibbonPanel ^ribbon,
-                                String ^iconName, String ^btnName,
-                                String ^entryPnt);
+            void                AddButton(UI::RibbonPanel ^ribbon,
+                                    String ^iconName, String ^btnName,
+                                    String ^entryPnt);
+            UI::PushButtonData  ^CreatePushButton(String ^nameAndText,
+                                    String ^iconName, String ^className);
+            void                AddExtraInfo(UI::PushButtonData ^btnData,
+                                    String ^avblClass, String ^toolTip);
         }; /* MainApp */
     } /* Applications */
 }

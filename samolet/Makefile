@@ -1,20 +1,22 @@
 # cmd Makefile
 
-nCC = cl
-CFLAGS = /nologo /clr /c /AI $(NET_ASMBS) /AI $(RVT_ASMBS) /Wall /Zi /DDEBUG /I$(LIB6) /I$(LIB4)
+CC = cl
+CFLAGS = /nologo /clr /c /AI $(NET_ASMBS) /AI $(RVT_ASMBS) /Wall /Zi /DDEBUG /I$(LIB6) /I$(LIB4) #/I.\apps\includes /I.\cmds\includes
 LD = link
 LDFLAGS = /NOLOGO /DLL /SUBSYSTEM:WINDOWS /MACHINE:X64 \
 	/LIBPATH:$(LIB1) /LIBPATH:$(LIB2) /LIBPATH:$(LIB3) /LIBPATH:$(LIB5) \
 	/ASSEMBLYRESOURCE:$(RSFILE)
 
 HDRS = stdafx.h utils.h app.h selValuesCmd.h selValuesCmdForm.h 
-SRCS = app.cpp utils.cpp selValuesCmd.cpp selValuesCmdForm.cpp
+SRCS = $(APPSRCS)\app.cpp $(CMDSRCS)\utils.cpp $(CMDSRCS)\selValuesCmd.cpp $(CMDSRCS)\selValuesCmdForm.cpp
 OBJS = app.obj utils.obj selValuesCmd.obj selValuesCmdForm.obj
 NAME = samolet.dll
 
+APPIN = apps\includes
+APPSRCS = apps\srcs
+CMDIN = cmds\includes
+CMDSRCS = cmds\srcs
 RSDIR = resources
-CMDDIR = commands
-APPDIR = applications
 
 RSFILE = .\$(RSDIR)\icons.resources
 DST = "%APPDATA%\Autodesk\Revit\Addins\2020"
