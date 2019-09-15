@@ -1,0 +1,8 @@
+# Ignore the build and lib dirs
+build
+lib/*
+
+# ignore any executable
+bin/*
+
+# ignore Windows/Mac specific files
