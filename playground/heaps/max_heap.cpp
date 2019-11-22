@@ -55,8 +55,11 @@ ref class MaxHeap {
   MaxHeap(void) {
     Initialize();
   }
+  MaxHeap(System::Collections::IEnumerable^ collection) {
+    Initialize();
+  }
   void Insert(HeapNode^ node) {
-
+    
   }
   HeapNode^ Maximum(void) {
     return (nullptr);
@@ -66,13 +69,14 @@ ref class MaxHeap {
   }
   void IncreaseKey(HeapNode^ node,
                    System::IComparable^ new_data) {
-
+    
   }
  private:
   void Initialize(void) {
     _count = 0;
   }
-  int	_count;
+  int		_count;
+  HeapNode^	_last_node;
 };
 
 void SwapNodes(Node^ node1, Node^ node2) {
