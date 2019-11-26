@@ -1,0 +1,10 @@
+*.pdb
+*.obj
+*.dll
+*.exe
+*.txt
+*~
+#*#
+build
+bin
+test 
